@@ -1,4 +1,4 @@
-# SoftBody Project
+# 2D Pressurized Softbody Physics
 
 A project to simulate 2D pressurized soft body physics in Java (using MVC architecture).
 
