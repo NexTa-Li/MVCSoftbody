@@ -6,10 +6,10 @@ public interface ModelConfig {
     static final double USER_FORCE = 250;
     static final double BOUNCINESS = 0.9; // 0.90 is a good value
     static final double SURFACE_FRICTION_COEFFICIENT = 0.02; // 0.01 is a good value
-    static final int NUM_SOFTBODIES = 2;
+    static final int NUM_SOFTBODIES = 5;
 
     static final int NUM_POINTS = 20;
-    static final double RADIUS = 45.0; // controls spacing between points during the first tick
+    static final double RADIUS = 5.0; // Radius of the softbodies during first tick, and their springs resting length
     static final double MASS = 0.5; // collisions are more reliable with smaller mass
     static final double SPRING_CONSTANT = 700.0;
     static final double SPRING_DAMPING = 30.0;
@@ -25,8 +25,8 @@ public interface ModelConfig {
      * This is used to resolve collisions between two mass points
      */
     static final double MASS_POINT_RADIUS = 0.1; // How big each mass point is
-    static final float POINT_SIZE = 2.0f;
+    static final float POINT_SIZE = 2.0f; // The visual size of each mass point
 
-    static final boolean DEBUG_MODE = true;
-    static final boolean RANDOM_POSITIONS = false;
+    static final boolean DEBUG_MODE = false;
+    static final boolean RANDOM_POSITIONS = true;
 }

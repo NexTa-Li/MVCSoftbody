@@ -376,7 +376,7 @@ public class SoftBody implements ReadOnlySoftBody {
             yMin = Math.min(yMin, points.get(i).getPositionY());
             yMax = Math.max(yMax, points.get(i).getPositionY());
 
-            // handleSoftBodyCollisions(i);
+            handleSoftBodyCollisions(i);
             handleRigidCollisions(i);
             handlePointCollisions(i);
         }
