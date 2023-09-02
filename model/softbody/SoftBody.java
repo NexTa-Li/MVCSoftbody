@@ -641,8 +641,8 @@ public class SoftBody implements ReadOnlySoftBody {
             // System.out.println("Closest Point: " + closestPoint);
 
             // Without these lines the sim is much more stable
-            softBodies.get(j).points.get(p1).setPosition(newX2, newY2);
-            softBodies.get(j).points.get(p2).setPosition(newX3, newY3);
+            // softBodies.get(j).points.get(p1).setPosition(newX2, newY2);
+            // softBodies.get(j).points.get(p2).setPosition(newX3, newY3);
 
             // System.out.println("new points: " +
             // softBodies.get(j).points.get(p1).getPosition() + ", "
@@ -817,12 +817,6 @@ public class SoftBody implements ReadOnlySoftBody {
             if (tempDistance <= oldDistance || !collided) {
                 edgePointIndices[0] = i;
                 edgePointIndices[1] = (i + 1) % points;
-
-                if (tempDistance == oldDistance) {
-                    edgePointIndices[2] = (i + 2) % points;
-                } else {
-                    edgePointIndices[2] = -1;
-                }
 
                 // this should probably only be set if theres actually a collision
                 closestPoint.setLocation(tempClosestPoint.getX(), tempClosestPoint.getY());
