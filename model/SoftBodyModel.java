@@ -64,12 +64,12 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
     }
 
     public void idle() {
-        // for (int i = 0; i < softBodies.size(); i++) {
-
-        // }
+        for (int i = 0; i < softBodies.size(); i++) {
+            softBodies.get(i).idle();
+        }
 
         for (int i = softBodies.size() - 1; i >= 0; i--) {
-            softBodies.get(i).idle();
+            // softBodies.get(i).idle();
         }
 
         // if (count % 800 == 0) {

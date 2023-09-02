@@ -347,3 +347,105 @@ void handleSoftBodyCollisions(int i) {
         }
     }
 ```
+
+### accumulateSoftBodyCollisionForce (Force based collision resolution)
+
+```java
+
+    void accumulateSoftBodyCollisionForce() {
+        for (int i = 0; i < points.size(); i++) {
+            for (int j = 0; j < softBodies.size(); j++) {
+
+                // skip self collision
+                if (softBodies.get(j) == this) {
+                    continue;
+                }
+
+                // skip if theres no collision
+                this.collided = false;
+                if (!checkCollision(points.get(i).getPosition(), softBodies.get(j))) {
+                    continue;
+                }
+
+                // skip if this point is at the same position as the closest point
+                if (points.get(i).getPosition().equals(closestPoint)) {
+                    continue;
+                }
+
+                int p1 = edgePointIndices[0];
+                int p2 = edgePointIndices[1];
+
+                // normal Vector
+                Vector2D n = new Vector2D(points.get(i).getPositionX() - closestPoint.getX(),
+                        points.get(i).getPositionY() - closestPoint.getY());
+
+                n.normalize();
+
+                // Calculate movement amounts
+                double moveAmount = n.getLength(); // distance from closest point to the edge
+
+                // velocity of this point
+                double fx = points.get(i).getForceX();
+                double fy = points.get(i).getForceY();
+
+                // other bodies point force
+                double o_fx = softBodies.get(j).points.get(p1).getForceX();
+                double o_fy = softBodies.get(j).points.get(p1).getForceY();
+
+                // handle vertex collisions
+                if (p2 == -1) {
+                    System.out.println("Handling vertex collision with: " + j);
+                    points.get(i).setPosition(closestPoint.getX(), closestPoint.getY());
+
+                    // calculate impulse
+                    double p = 2 * ((fx * n.getX() + fy * n.getY()) - (o_fx * n.getX() + o_fy *
+                            n.getY()))
+                            / (SOFTBODY_MASS + softBodies.get(j).SOFTBODY_MASS);
+
+                    double fx1 = fx - (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
+                    double fy1 = fy - (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
+
+                    double fx2 = o_fx + (p * SOFTBODY_MASS * n.getX());
+                    double fy2 = o_fy + (p * SOFTBODY_MASS * n.getY());
+
+                    points.get(i).addForce(fx1, fy1);
+                    softBodies.get(j).points.get(p1).addForce(fx2, fy2);
+
+                    continue;
+                }
+
+                // Calculate edge length
+                double totalDist = points.get(p1).getPosition().distance(points.get(p2).getPosition());
+
+                if (totalDist == 0) // extremely rare case where all points are at the same position
+                    continue;
+
+                n.multiply(moveAmount);
+                // Calculate new positions for each point
+                double newX1 = points.get(i).getPositionX() - n.getX();
+                double newY1 = points.get(i).getPositionY() - n.getY();
+
+                points.get(i).setPosition(newX1, newY1);
+                n.normalize();
+
+                // else handle edge collisions
+                double edgeFx = (o_fx + softBodies.get(j).points.get(p2).getForceX()) / 2.0;
+                double edgeFy = (o_fy + softBodies.get(j).points.get(p2).getForceY()) / 2.0;
+
+                double p = 2 * ((fx * n.getX() + fy * n.getY()) - (edgeFx * n.getX() + edgeFy * n.getY()))
+                        / (SOFTBODY_MASS + softBodies.get(j).SOFTBODY_MASS);
+
+                double fx1 = fx - (p * SOFTBODY_MASS * n.getX());
+                double fy1 = fy - (p * SOFTBODY_MASS * n.getY());
+
+                double fx2 = edgeFx + (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
+                double fy2 = edgeFy + (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
+
+                points.get(i).addForce(fx1, fy1);
+                softBodies.get(j).points.get(p1).addForce(fx2, fy2);
+                softBodies.get(j).points.get(p2).addForce(fx2, fy2);
+            }
+        }
+    }
+
+```

@@ -355,7 +355,7 @@ public class SoftBody implements ReadOnlySoftBody {
 
         for (int i = 0; i < NUM_POINTS; i++) {
             // handle friction
-            applyFriction(i);
+            // applyFriction(i);
 
             ForceSaved.add(new Vector2D(points.get(i).getForce()));
             VelocitySaved.add(new Vector2D(points.get(i).getVelocity()));
@@ -390,7 +390,7 @@ public class SoftBody implements ReadOnlySoftBody {
         accumulateForces();
 
         for (int i = 0; i < NUM_POINTS; i++) {
-            applyFriction(i);
+            // applyFriction(i);
             double dvx = (points.get(i).getForceX() + ForceSaved.get(i).getX()) / SOFTBODY_MASS * ModelConfig.timestep;
             double dvy = (points.get(i).getForceY() + ForceSaved.get(i).getY()) / SOFTBODY_MASS * ModelConfig.timestep;
 
@@ -425,102 +425,6 @@ public class SoftBody implements ReadOnlySoftBody {
         }
     }
 
-    void accumulateSoftBodyCollisionForce() {
-        for (int i = 0; i < points.size(); i++) {
-            for (int j = 0; j < softBodies.size(); j++) {
-
-                // skip self collision
-                if (softBodies.get(j) == this) {
-                    continue;
-                }
-
-                // skip if theres no collision
-                this.collided = false;
-                if (!checkCollision(points.get(i).getPosition(), softBodies.get(j))) {
-                    continue;
-                }
-
-                // skip if this point is at the same position as the closest point
-                if (points.get(i).getPosition().equals(closestPoint)) {
-                    continue;
-                }
-
-                int p1 = edgePointIndices[0];
-                int p2 = edgePointIndices[1];
-
-                // normal Vector
-                Vector2D n = new Vector2D(points.get(i).getPositionX() - closestPoint.getX(),
-                        points.get(i).getPositionY() - closestPoint.getY());
-
-                n.normalize();
-
-                // Calculate movement amounts
-                double moveAmount = n.getLength(); // distance from closest point to the edge
-
-                // velocity of this point
-                double fx = points.get(i).getForceX();
-                double fy = points.get(i).getForceY();
-
-                // other bodies point force
-                double o_fx = softBodies.get(j).points.get(p1).getForceX();
-                double o_fy = softBodies.get(j).points.get(p1).getForceY();
-
-                // handle vertex collisions
-                if (p2 == -1) {
-                    System.out.println("Handling vertex collision with: " + j);
-                    points.get(i).setPosition(closestPoint.getX(), closestPoint.getY());
-
-                    // calculate impulse
-                    double p = 2 * ((fx * n.getX() + fy * n.getY()) - (o_fx * n.getX() + o_fy *
-                            n.getY()))
-                            / (SOFTBODY_MASS + softBodies.get(j).SOFTBODY_MASS);
-
-                    double fx1 = fx - (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
-                    double fy1 = fy - (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
-
-                    double fx2 = o_fx + (p * SOFTBODY_MASS * n.getX());
-                    double fy2 = o_fy + (p * SOFTBODY_MASS * n.getY());
-
-                    points.get(i).addForce(fx1, fy1);
-                    softBodies.get(j).points.get(p1).addForce(fx2, fy2);
-
-                    continue;
-                }
-
-                // Calculate edge length
-                double totalDist = points.get(p1).getPosition().distance(points.get(p2).getPosition());
-
-                if (totalDist == 0) // extremely rare case where all points are at the same position
-                    continue;
-
-                n.multiply(moveAmount);
-                // Calculate new positions for each point
-                double newX1 = points.get(i).getPositionX() - n.getX();
-                double newY1 = points.get(i).getPositionY() - n.getY();
-
-                points.get(i).setPosition(newX1, newY1);
-                n.normalize();
-
-                // else handle edge collisions
-                double edgeFx = (o_fx + softBodies.get(j).points.get(p2).getForceX()) / 2.0;
-                double edgeFy = (o_fy + softBodies.get(j).points.get(p2).getForceY()) / 2.0;
-
-                double p = 2 * ((fx * n.getX() + fy * n.getY()) - (edgeFx * n.getX() + edgeFy * n.getY()))
-                        / (SOFTBODY_MASS + softBodies.get(j).SOFTBODY_MASS);
-
-                double fx1 = fx - (p * SOFTBODY_MASS * n.getX());
-                double fy1 = fy - (p * SOFTBODY_MASS * n.getY());
-
-                double fx2 = edgeFx + (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
-                double fy2 = edgeFy + (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
-
-                points.get(i).addForce(fx1, fy1);
-                softBodies.get(j).points.get(p1).addForce(fx2, fy2);
-                softBodies.get(j).points.get(p2).addForce(fx2, fy2);
-            }
-        }
-    }
-
     /**
      * Checks for and Resolves collisions between the point at index i and another
      * softbody
@@ -537,9 +441,11 @@ public class SoftBody implements ReadOnlySoftBody {
 
             // skip if theres no collision
             this.collided = false; // fix
+            System.out.println("Checking collision with: " + j);
             if (!checkCollision(points.get(i).getPosition(), softBodies.get(j))) {
                 continue;
             }
+            System.out.println("Collision detected with: " + j);
 
             // skip if this point is at the same position as the closest point
             if (points.get(i).getPosition().equals(closestPoint)) {
@@ -609,8 +515,11 @@ public class SoftBody implements ReadOnlySoftBody {
             n.multiply(moveAmount);
 
             // Calculate new positions for each point
-            double newX1 = points.get(i).getPositionX() - n.getX();
-            double newY1 = points.get(i).getPositionY() - n.getY();
+            // double newX1 = points.get(i).getPositionX() - n.getX();
+            // double newY1 = points.get(i).getPositionY() - n.getY();
+
+            double newX1 = closestPoint.getX();
+            double newY1 = closestPoint.getY();
 
             n.normalize();
             n.multiply(moveFactorP1 * moveAmount / 2.0);
@@ -628,17 +537,17 @@ public class SoftBody implements ReadOnlySoftBody {
             // vector
 
             // Update positions
-            // System.out.println("Handling collision with: " + j);
-            // System.out.println("Old Position: " + points.get(i).getPosition());
+            System.out.println("Handling collision with: " + j);
+            System.out.println("Old Position: " + points.get(i).getPosition());
             points.get(i).setPosition(newX1, newY1);
 
-            // System.out.println("New Position: " + points.get(i).getPosition());
+            System.out.println("New Position: " + points.get(i).getPosition());
 
-            // System.out.println("old: " + softBodies.get(j).points.get(p1).getPosition() +
-            // ", "
-            // + softBodies.get(j).points.get(p2).getPosition());
+            System.out.println("old: " + softBodies.get(j).points.get(p1).getPosition() +
+                    ", "
+                    + softBodies.get(j).points.get(p2).getPosition());
 
-            // System.out.println("Closest Point: " + closestPoint);
+            System.out.println("Closest Point: " + closestPoint);
 
             // Without these lines the sim is much more stable
             // softBodies.get(j).points.get(p1).setPosition(newX2, newY2);
@@ -823,12 +732,21 @@ public class SoftBody implements ReadOnlySoftBody {
                 collided = true;
             }
 
-            // check if the ray intersects the edge
-            if (SoftBodyUtil.checkIntersection(rayStart, position, edgeStart, edgeEnd)) {
-                intersectionCount++;
+            /*
+             * check if the ray intersects the edge.
+             * Also check if the ray is at the same height as a point on
+             * the edge, if it is, then the next edge will be intersected, so we skip this
+             */
+            if (!SoftBodyUtil.checkIntersection(rayStart, position, edgeStart, edgeEnd)
+                    || edgeEnd.getY() == position.getY()) {
+                continue;
             }
+
+            intersectionCount++;
+
         }
 
+        System.out.println("Intersection count: " + intersectionCount);
         // If the number of intersections is odd, then the point is inside the soft body
         if (intersectionCount % 2 == 1) {
 
