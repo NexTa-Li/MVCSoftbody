@@ -10,4 +10,4 @@
 
 ### Removed
 
-- `Artifacts` in `checkCollisions()` & `handleSoftbodyCollisions()` : Removing some code artifacts that were left over from old ideas/ debugging
+- `Artifacts` in `checkCollisions()` & `handleSoftbodyCollisions()` : Removing some code artifacts that were left over from old ideas/ debugging.
