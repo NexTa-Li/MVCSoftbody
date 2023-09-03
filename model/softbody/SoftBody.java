@@ -441,11 +441,10 @@ public class SoftBody implements ReadOnlySoftBody {
 
             // skip if theres no collision
             this.collided = false; // fix
-            System.out.println("Checking collision with: " + j);
             if (!checkCollision(points.get(i).getPosition(), softBodies.get(j))) {
                 continue;
             }
-            System.out.println("Collision detected with: " + j);
+            // System.out.println("Collision detected with: " + j);
 
             // skip if this point is at the same position as the closest point
             if (points.get(i).getPosition().equals(closestPoint)) {
@@ -458,10 +457,6 @@ public class SoftBody implements ReadOnlySoftBody {
             // normal Vector
             Vector2D n = new Vector2D(points.get(i).getPositionX() - closestPoint.getX(),
                     points.get(i).getPositionY() - closestPoint.getY());
-            n.normalize();
-
-            // Calculate movement amounts
-            double moveAmount = n.getLength() / 2.0; // distance from closest point to the edge
 
             // velocity of this point
             double vx = points.get(i).getVelocityX();
@@ -474,6 +469,7 @@ public class SoftBody implements ReadOnlySoftBody {
             // handle vertex collisions
             if (p2 == -1) {
                 System.out.println("Handling vertex collision with: " + j);
+                n.normalize();
                 points.get(i).setPosition(closestPoint.getX(), closestPoint.getY());
 
                 // calculate impulse
@@ -495,71 +491,33 @@ public class SoftBody implements ReadOnlySoftBody {
                 points.get(i).setVelocity(vx1, vy1);
                 softBodies.get(j).points.get(p1).setVelocity(vx2, vy2);
 
-                continue;
+                continue; // skip the rest
             }
 
-            // Calculate distances from points to the closest point
-            double distP1 = points.get(p1).getPosition().distance(closestPoint);
-            double distP2 = points.get(p2).getPosition().distance(closestPoint);
-
-            // Calculate edge length
-            double totalDist = points.get(p1).getPosition().distance(points.get(p2).getPosition());
-
-            if (totalDist == 0) // extremely rare case where all points are at the same position
-                continue; // skip because we can't divide by 0
-
-            // Calculate movement factors based on distances
-            double moveFactorP1 = distP2 / totalDist;
-            double moveFactorP2 = distP1 / totalDist;
-
-            n.multiply(moveAmount);
+            n.divide(2.0);
 
             // Calculate new positions for each point
-            // double newX1 = points.get(i).getPositionX() - n.getX();
-            // double newY1 = points.get(i).getPositionY() - n.getY();
+            double newX1 = closestPoint.getX() + n.getX();
+            double newY1 = closestPoint.getY() + n.getY();
 
-            double newX1 = closestPoint.getX();
-            double newY1 = closestPoint.getY();
-
-            n.normalize();
-            n.multiply(moveFactorP1 * moveAmount / 2.0);
-            // System.out.println(moveFactorP1);
             double newX2 = softBodies.get(j).points.get(p1).getPositionX() + n.getX();
             double newY2 = softBodies.get(j).points.get(p1).getPositionY() + n.getY();
 
-            n.normalize();
-            n.multiply(moveFactorP2 * moveAmount / 2.0);
-            // System.out.println(moveFactorP2);
             double newX3 = softBodies.get(j).points.get(p2).getPositionX() + n.getX();
             double newY3 = softBodies.get(j).points.get(p2).getPositionY() + n.getY();
 
             // Calculate the new positions for the edge points using the closestToSingle
             // vector
 
-            // Update positions
-            System.out.println("Handling collision with: " + j);
-            System.out.println("Old Position: " + points.get(i).getPosition());
             points.get(i).setPosition(newX1, newY1);
 
-            System.out.println("New Position: " + points.get(i).getPosition());
+            softBodies.get(j).points.get(p1).setPosition(newX2, newY2);
+            softBodies.get(j).points.get(p2).setPosition(newX3, newY3);
 
-            System.out.println("old: " + softBodies.get(j).points.get(p1).getPosition() +
-                    ", "
-                    + softBodies.get(j).points.get(p2).getPosition());
-
-            System.out.println("Closest Point: " + closestPoint);
-
-            // Without these lines the sim is much more stable
-            // softBodies.get(j).points.get(p1).setPosition(newX2, newY2);
-            // softBodies.get(j).points.get(p2).setPosition(newX3, newY3);
-
-            // System.out.println("new points: " +
-            // softBodies.get(j).points.get(p1).getPosition() + ", "
-            // + softBodies.get(j).points.get(p2).getPosition());
-
+            // normalize for the collision calculations
             n.normalize();
 
-            // else handle edge collisions
+            // handle edge collisions
             double edgeVx = (o_vx + softBodies.get(j).points.get(p2).getVelocityX()) / 2.0;
             double edgeVy = (o_vy + softBodies.get(j).points.get(p2).getVelocityY()) / 2.0;
 
@@ -642,7 +600,7 @@ public class SoftBody implements ReadOnlySoftBody {
 
             double distance = points.get(i).getPosition().distance(points.get(j).getPosition());
 
-            if (distance >= ModelConfig.MASS_POINT_RADIUS) {
+            if (distance >= ModelConfig.MASS_POINT_RADIUS || distance == 0) {
                 continue;
             }
 
@@ -737,16 +695,17 @@ public class SoftBody implements ReadOnlySoftBody {
              * Also check if the ray is at the same height as a point on
              * the edge, if it is, then the next edge will be intersected, so we skip this
              */
-            if (!SoftBodyUtil.checkIntersection(rayStart, position, edgeStart, edgeEnd)
-                    || edgeEnd.getY() == position.getY()) {
+            if (!SoftBodyUtil.checkIntersection(rayStart, position, edgeStart, edgeEnd)) {
+                continue;
+            }
+
+            if (position.getY() == edgeEnd.getY()) {
                 continue;
             }
 
             intersectionCount++;
-
         }
 
-        System.out.println("Intersection count: " + intersectionCount);
         // If the number of intersections is odd, then the point is inside the soft body
         if (intersectionCount % 2 == 1) {
 
@@ -796,24 +755,32 @@ public class SoftBody implements ReadOnlySoftBody {
         Graphics2D g = (Graphics2D) graphics;
         g.setStroke(new BasicStroke(2));
 
-        g.setColor(Color.gray);
-        // g.fillPolygon(getXArr(), getYArr(), NUM_POINTS);
-
-        g.setColor(Color.gray);
-        for (int i = 0; i < NUM_POINTS; i++) {
-            g.drawLine((int) points.get(springs.get(i).getP1()).getPosition().getX(),
-                    (int) points.get(springs.get(i).getP1()).getPosition().getY(),
-                    (int) points.get(springs.get(i).getP2()).getPosition().getX(),
-                    (int) points.get(springs.get(i).getP2()).getPosition().getY());
+        if (SoftBodyModel.fillSofbtody) {
+            g.setColor(Color.gray);
+            g.fillPolygon(getXArr(), getYArr(), NUM_POINTS);
         }
 
-        g.setColor(Color.red);
+        if (SoftBodyModel.drawSprings) {
+            g.setColor(Color.WHITE);
+            for (int i = 0; i < NUM_POINTS; i++) {
+                g.drawLine((int) points.get(springs.get(i).getP1()).getPosition().getX(),
+                        (int) points.get(springs.get(i).getP1()).getPosition().getY(),
+                        (int) points.get(springs.get(i).getP2()).getPosition().getX(),
+                        (int) points.get(springs.get(i).getP2()).getPosition().getY());
+            }
+        }
 
-        for (int i = 0; i < NUM_POINTS; i++) {
+        if (SoftBodyModel.drawPoints) {
+            g.setColor(Color.red);
 
-            g.fillOval((int) (points.get(i).getPositionX() - ModelConfig.POINT_SIZE),
-                    (int) (points.get(i).getPositionY() - ModelConfig.POINT_SIZE), (int) (2 * ModelConfig.POINT_SIZE),
-                    (int) (2 * ModelConfig.POINT_SIZE));
+            for (int i = 0; i < NUM_POINTS; i++) {
+
+                g.fillOval((int) (points.get(i).getPositionX() - ModelConfig.POINT_SIZE),
+                        (int) (points.get(i).getPositionY() - ModelConfig.POINT_SIZE), (int) (2 *
+                                ModelConfig.POINT_SIZE),
+                        (int) (2 * ModelConfig.POINT_SIZE));
+            }
+
         }
 
     }

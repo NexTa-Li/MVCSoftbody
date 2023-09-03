@@ -25,6 +25,14 @@
 
 - Spacial partitioning, quadtrees, or some other data structure.
 
+- Create a CollisionHandler Utility class, the code will be a little cleaner.
+
+### Collision Changes:
+
+- In general the collisions should probably be handled in a different way, for example if one body is colliding with another, then the other body should be notified of the collision and then it should handle it.
+
+- Currently a colliding point will move the edge points both a different amount depending on how far each is from the closest point. This is fine but due to the rest of the implementation, specifically how check collision iterates through each edge
+
 # Bugs
 
 - Two bodies at the exact same height can cause a missed collision, I suspect this is because the collision detector doesn't check for intersections through points
@@ -52,5 +60,6 @@
 - The system is introducing a lot of extra energy somehow.
 - I suspect this is due to handling the collisions inside of the integration, but if not in there then where else?
 - I can move handle softbody collisions to accumulate forces and change the resolved velocities to forces, this would mean resolving softbody collisions two times per idle call.
+- Update [ 2023-09-02 ]: this is driving me insane. it could be being caused by so many different things. Even a slight miscalculation in positions could cause a chain reaction of collisions permanently that could very easily be the reason why there is so much extra energy.
 
 # Math

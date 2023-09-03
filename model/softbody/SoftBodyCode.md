@@ -449,3 +449,437 @@ void handleSoftBodyCollisions(int i) {
     }
 
 ```
+
+```java
+
+void handleSoftBodyCollisions(int i) {
+        for (int j = 0; j < softBodies.size(); j++) {
+
+            // skip self collision
+            if (softBodies.get(j) == this) {
+                continue;
+            }
+
+            // skip if theres no collision
+            this.collided = false; // fix
+            if (!checkCollision(points.get(i).getPosition(), softBodies.get(j))) {
+                continue;
+            }
+            // System.out.println("Collision detected with: " + j);
+
+            // skip if this point is at the same position as the closest point
+            if (points.get(i).getPosition().equals(closestPoint)) {
+                continue;
+            }
+
+            int p1 = edgePointIndices[0];
+            int p2 = edgePointIndices[1];
+
+            // normal Vector
+            Vector2D n = new Vector2D(points.get(i).getPositionX() - closestPoint.getX(),
+                    points.get(i).getPositionY() - closestPoint.getY());
+            // n.normalize();
+
+            // Calculate movement amounts
+            double moveAmount = n.getLength() / 2.0; // distance from closest point to the edge
+
+            // velocity of this point
+            double vx = points.get(i).getVelocityX();
+            double vy = points.get(i).getVelocityY();
+
+            // other bodies point velocity
+            double o_vx = softBodies.get(j).points.get(p1).getVelocityX();
+            double o_vy = softBodies.get(j).points.get(p1).getVelocityY();
+
+            // handle vertex collisions
+            if (p2 == -1) {
+                System.out.println("Handling vertex collision with: " + j);
+                points.get(i).setPosition(closestPoint.getX(), closestPoint.getY());
+
+                // calculate impulse
+                double p = 2 * ((vx * n.getX() + vy * n.getY()) - (o_vx * n.getX() + o_vy *
+                        n.getY()))
+                        / (SOFTBODY_MASS + softBodies.get(j).SOFTBODY_MASS);
+
+                double vx1 = vx - (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
+                double vy1 = vy - (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
+
+                double vx2 = o_vx + (p * SOFTBODY_MASS * n.getX());
+                double vy2 = o_vy + (p * SOFTBODY_MASS * n.getY());
+
+                vx1 *= ModelConfig.BOUNCINESS;
+                vy1 *= ModelConfig.BOUNCINESS;
+                vx2 *= ModelConfig.BOUNCINESS;
+                vy2 *= ModelConfig.BOUNCINESS;
+
+                points.get(i).setVelocity(vx1, vy1);
+                softBodies.get(j).points.get(p1).setVelocity(vx2, vy2);
+
+                continue;
+            }
+
+            // Calculate distances from points to the closest point
+            double distP1 = points.get(p1).getPosition().distance(closestPoint);
+            double distP2 = points.get(p2).getPosition().distance(closestPoint);
+
+            // Calculate edge length
+            double totalDist = points.get(p1).getPosition().distance(points.get(p2).getPosition());
+
+            if (totalDist == 0) // extremely rare case where all points are at the same position
+                continue; // skip because we can't divide by 0
+
+            // Calculate movement factors based on distances
+            double moveFactorP1 = distP2 / totalDist;
+            double moveFactorP2 = distP1 / totalDist;
+
+            n.multiply(moveAmount);
+
+            // Calculate new positions for each point
+            double newX1 = closestPoint.getX() - n.getX();
+            double newY1 = closestPoint.getY() - n.getY();
+
+            // double newX1 = closestPoint.getX();
+            // double newY1 = closestPoint.getY();
+
+            // System.out.println(moveFactorP1);
+            n.multiply(moveFactorP1);
+            double newX2 = softBodies.get(j).points.get(p1).getPositionX() + n.getX();
+            double newY2 = softBodies.get(j).points.get(p1).getPositionY() + n.getY();
+
+            // System.out.println(moveFactorP2);
+            n.divide(moveFactorP1);
+            n.multiply(moveFactorP2);
+            double newX3 = softBodies.get(j).points.get(p2).getPositionX() + n.getX();
+            double newY3 = softBodies.get(j).points.get(p2).getPositionY() + n.getY();
+
+            // Calculate the new positions for the edge points using the closestToSingle
+            // vector
+
+            // Update positions
+            // System.out.println("Old Position: " + points.get(i).getPosition());
+            points.get(i).setPosition(newX1, newY1);
+
+            // System.out.println("New Position: " + points.get(i).getPosition());
+
+            // System.out.println("old: " + softBodies.get(j).points.get(p1).getPosition() +
+            // ", "
+            // + softBodies.get(j).points.get(p2).getPosition());
+
+            // System.out.println("Closest Point: " + closestPoint);
+
+            // Without these lines the sim is much more stable
+            softBodies.get(j).points.get(p1).setPosition(newX2, newY2);
+            softBodies.get(j).points.get(p2).setPosition(newX3, newY3);
+
+            // System.out.println("new points: " +
+            // softBodies.get(j).points.get(p1).getPosition() + ", "
+            // + softBodies.get(j).points.get(p2).getPosition());
+
+            n.normalize();
+
+            // else handle edge collisions
+            double edgeVx = (o_vx + softBodies.get(j).points.get(p2).getVelocityX()) / 2.0;
+            double edgeVy = (o_vy + softBodies.get(j).points.get(p2).getVelocityY()) / 2.0;
+
+            double p = 2 * ((vx * n.getX() + vy * n.getY()) - (edgeVx * n.getX() + edgeVy * n.getY()))
+                    / (SOFTBODY_MASS + softBodies.get(j).SOFTBODY_MASS);
+
+            double vx1 = vx - (p * SOFTBODY_MASS * n.getX());
+            double vy1 = vy - (p * SOFTBODY_MASS * n.getY());
+
+            double vx2 = edgeVx + (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
+            double vy2 = edgeVy + (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
+
+            vx1 *= ModelConfig.BOUNCINESS;
+            vy1 *= ModelConfig.BOUNCINESS;
+            vx2 *= ModelConfig.BOUNCINESS;
+            vy2 *= ModelConfig.BOUNCINESS;
+
+            points.get(i).setVelocity(vx1, vy1);
+            softBodies.get(j).points.get(p1).setVelocity(vx2, vy2);
+            softBodies.get(j).points.get(p2).setVelocity(vx2, vy2);
+
+        }
+    }
+
+```
+
+```java
+
+void handleSoftBodyCollisions(int i) {
+        for (int j = 0; j < softBodies.size(); j++) {
+
+            // skip self collision
+            if (softBodies.get(j) == this) {
+                continue;
+            }
+
+            // skip if theres no collision
+            this.collided = false; // fix
+            if (!checkCollision(points.get(i).getPosition(), softBodies.get(j))) {
+                continue;
+            }
+            // System.out.println("Collision detected with: " + j);
+
+            // skip if this point is at the same position as the closest point
+            if (points.get(i).getPosition().equals(closestPoint)) {
+                continue;
+            }
+
+            int p1 = edgePointIndices[0];
+            int p2 = edgePointIndices[1];
+
+            // normal Vector
+            Vector2D n = new Vector2D(points.get(i).getPositionX() - closestPoint.getX(),
+                    points.get(i).getPositionY() - closestPoint.getY());
+
+            // Calculate movement amounts
+            double moveAmount = n.getLength() / 2.0; // distance from closest point to the edge
+
+
+            // velocity of this point
+            double vx = points.get(i).getVelocityX();
+            double vy = points.get(i).getVelocityY();
+
+            // other bodies point velocity
+            double o_vx = softBodies.get(j).points.get(p1).getVelocityX();
+            double o_vy = softBodies.get(j).points.get(p1).getVelocityY();
+
+            // handle vertex collisions
+            if (p2 == -1) {
+                System.out.println("Handling vertex collision with: " + j);
+                points.get(i).setPosition(closestPoint.getX(), closestPoint.getY());
+
+                // calculate impulse
+                double p = 2 * ((vx * n.getX() + vy * n.getY()) - (o_vx * n.getX() + o_vy *
+                        n.getY()))
+                        / (SOFTBODY_MASS + softBodies.get(j).SOFTBODY_MASS);
+
+                double vx1 = vx - (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
+                double vy1 = vy - (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
+
+                double vx2 = o_vx + (p * SOFTBODY_MASS * n.getX());
+                double vy2 = o_vy + (p * SOFTBODY_MASS * n.getY());
+
+                vx1 *= ModelConfig.BOUNCINESS;
+                vy1 *= ModelConfig.BOUNCINESS;
+                vx2 *= ModelConfig.BOUNCINESS;
+                vy2 *= ModelConfig.BOUNCINESS;
+
+                points.get(i).setVelocity(vx1, vy1);
+                softBodies.get(j).points.get(p1).setVelocity(vx2, vy2);
+
+                continue;
+            }
+
+            // Calculate distances from points to the closest point
+            double distP1 = points.get(p1).getPosition().distance(closestPoint);
+            double distP2 = points.get(p2).getPosition().distance(closestPoint);
+
+            // Calculate edge length
+            double totalDist = points.get(p1).getPosition().distance(points.get(p2).getPosition());
+
+            if (totalDist == 0) // extremely rare case where all points are at the same position
+                continue; // skip because we can't divide by 0
+
+            // Calculate movement factors based on distances
+            double moveFactorP1 = distP2 / totalDist;
+            double moveFactorP2 = distP1 / totalDist;
+
+            n.multiply(moveAmount);
+
+            // Calculate new positions for each point
+            double newX1 = closestPoint.getX() - n.getX();
+            double newY1 = closestPoint.getY() - n.getY();
+
+            n.multiply(moveFactorP1);
+            double newX2 = softBodies.get(j).points.get(p1).getPositionX() + n.getX();
+            double newY2 = softBodies.get(j).points.get(p1).getPositionY() + n.getY();
+
+            n.divide(moveFactorP1);
+            n.multiply(moveFactorP2);
+            double newX3 = softBodies.get(j).points.get(p2).getPositionX() + n.getX();
+            double newY3 = softBodies.get(j).points.get(p2).getPositionY() + n.getY();
+
+            // Update positions
+            points.get(i).setPosition(newX1, newY1);
+            softBodies.get(j).points.get(p1).setPosition(newX2, newY2);
+            softBodies.get(j).points.get(p2).setPosition(newX3, newY3);
+
+            n.normalize();
+
+            // else handle edge collisions
+            double edgeVx = (o_vx + softBodies.get(j).points.get(p2).getVelocityX()) / 2.0;
+            double edgeVy = (o_vy + softBodies.get(j).points.get(p2).getVelocityY()) / 2.0;
+
+            double p = 2 * ((vx * n.getX() + vy * n.getY()) - (edgeVx * n.getX() + edgeVy * n.getY()))
+                    / (SOFTBODY_MASS + softBodies.get(j).SOFTBODY_MASS);
+
+            double vx1 = vx - (p * SOFTBODY_MASS * n.getX());
+            double vy1 = vy - (p * SOFTBODY_MASS * n.getY());
+
+            double vx2 = edgeVx + (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
+            double vy2 = edgeVy + (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
+
+            vx1 *= ModelConfig.BOUNCINESS;
+            vy1 *= ModelConfig.BOUNCINESS;
+            vx2 *= ModelConfig.BOUNCINESS;
+            vy2 *= ModelConfig.BOUNCINESS;
+
+            points.get(i).setVelocity(vx1, vy1);
+            softBodies.get(j).points.get(p1).setVelocity(vx2, vy2);
+            softBodies.get(j).points.get(p2).setVelocity(vx2, vy2);
+
+        }
+    }
+```
+
+### Slightly more stable
+
+```java
+/**
+     * Checks for and Resolves collisions between the point at index i and another
+     * softbody
+     *
+     * @param i index of the point
+     */
+    void handleSoftBodyCollisions(int i) {
+        for (int j = 0; j < softBodies.size(); j++) {
+
+            // skip self collision
+            if (softBodies.get(j) == this) {
+                continue;
+            }
+
+            // skip if theres no collision
+            this.collided = false; // fix
+            if (!checkCollision(points.get(i).getPosition(), softBodies.get(j))) {
+                continue;
+            }
+            // System.out.println("Collision detected with: " + j);
+
+            // skip if this point is at the same position as the closest point
+            if (points.get(i).getPosition().equals(closestPoint)) {
+                continue;
+            }
+
+            int p1 = edgePointIndices[0];
+            int p2 = edgePointIndices[1];
+
+            // normal Vector
+            Vector2D n = new Vector2D(points.get(i).getPositionX() - closestPoint.getX(),
+                    points.get(i).getPositionY() - closestPoint.getY());
+            // n.normalize();
+
+            // Calculate movement amounts
+            double moveAmount = n.getLength() / 2.0; // distance from closest point to the edge
+
+            // velocity of this point
+            double vx = points.get(i).getVelocityX();
+            double vy = points.get(i).getVelocityY();
+
+            // other bodies point velocity
+            double o_vx = softBodies.get(j).points.get(p1).getVelocityX();
+            double o_vy = softBodies.get(j).points.get(p1).getVelocityY();
+
+            // handle vertex collisions
+            if (p2 == -1) {
+                System.out.println("Handling vertex collision with: " + j);
+                n.normalize();
+                points.get(i).setPosition(closestPoint.getX(), closestPoint.getY());
+
+                // calculate impulse
+                double p = 2 * ((vx * n.getX() + vy * n.getY()) - (o_vx * n.getX() + o_vy *
+                        n.getY()))
+                        / (SOFTBODY_MASS + softBodies.get(j).SOFTBODY_MASS);
+
+                double vx1 = vx - (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
+                double vy1 = vy - (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
+
+                double vx2 = o_vx + (p * SOFTBODY_MASS * n.getX());
+                double vy2 = o_vy + (p * SOFTBODY_MASS * n.getY());
+
+                vx1 *= ModelConfig.BOUNCINESS;
+                vy1 *= ModelConfig.BOUNCINESS;
+                vx2 *= ModelConfig.BOUNCINESS;
+                vy2 *= ModelConfig.BOUNCINESS;
+
+                points.get(i).setVelocity(vx1, vy1);
+                softBodies.get(j).points.get(p1).setVelocity(vx2, vy2);
+
+                continue;
+            }
+
+            // Calculate distances from points to the closest point
+            double distP1 = points.get(p1).getPosition().distance(closestPoint);
+            double distP2 = points.get(p2).getPosition().distance(closestPoint);
+
+            // Calculate edge length
+            double totalDist = points.get(p1).getPosition().distance(points.get(p2).getPosition());
+
+            if (totalDist == 0) // extremely rare case where all points are at the same position
+                continue; // skip because we can't divide by 0
+
+            // Calculate movement factors based on distances
+            double moveFactorP1 = distP2 / totalDist;
+            double moveFactorP2 = distP1 / totalDist;
+
+            // Calculate new positions for each point
+            double newX1 = closestPoint.getX() + n.getX() / 2;
+            double newY1 = closestPoint.getY() + n.getY() / 2;
+
+            double newX2 = softBodies.get(j).points.get(p1).getPositionX() + n.getX() / 2;
+            double newY2 = softBodies.get(j).points.get(p1).getPositionY() + n.getY() / 2;
+
+            double newX3 = softBodies.get(j).points.get(p2).getPositionX() + n.getX() / 2;
+            double newY3 = softBodies.get(j).points.get(p2).getPositionY() + n.getY() / 2;
+
+            // Calculate the new positions for the edge points using the closestToSingle
+            // vector
+
+            // Update positions
+            // System.out.println("Old Position: " + points.get(i).getPosition());
+            points.get(i).setPosition(newX1, newY1);
+
+            // System.out.println("New Position: " + points.get(i).getPosition());
+
+            // System.out.println("old: " + softBodies.get(j).points.get(p1).getPosition() +
+            // ", "
+            // + softBodies.get(j).points.get(p2).getPosition());
+
+            // System.out.println("Closest Point: " + closestPoint);
+
+            // Without these lines the sim is much more stable
+            softBodies.get(j).points.get(p1).setPosition(newX2, newY2);
+            softBodies.get(j).points.get(p2).setPosition(newX3, newY3);
+
+            // System.out.println("new points: " +
+            // softBodies.get(j).points.get(p1).getPosition() + ", "
+            // + softBodies.get(j).points.get(p2).getPosition());
+            n.normalize();
+
+            // else handle edge collisions
+            double edgeVx = (o_vx + softBodies.get(j).points.get(p2).getVelocityX()) / 2.0;
+            double edgeVy = (o_vy + softBodies.get(j).points.get(p2).getVelocityY()) / 2.0;
+
+            double p = 2 * ((vx * n.getX() + vy * n.getY()) - (edgeVx * n.getX() + edgeVy * n.getY()))
+                    / (SOFTBODY_MASS + softBodies.get(j).SOFTBODY_MASS);
+
+            double vx1 = vx - (p * SOFTBODY_MASS * n.getX());
+            double vy1 = vy - (p * SOFTBODY_MASS * n.getY());
+
+            double vx2 = edgeVx + (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
+            double vy2 = edgeVy + (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
+
+            vx1 *= ModelConfig.BOUNCINESS;
+            vy1 *= ModelConfig.BOUNCINESS;
+            vx2 *= ModelConfig.BOUNCINESS;
+            vy2 *= ModelConfig.BOUNCINESS;
+
+            points.get(i).setVelocity(vx1, vy1);
+            softBodies.get(j).points.get(p1).setVelocity(vx2, vy2);
+            softBodies.get(j).points.get(p2).setVelocity(vx2, vy2);
+
+        }
+    }
+```

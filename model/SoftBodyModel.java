@@ -11,9 +11,14 @@ import view.ViewConfig;
 
 public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
-    public Thread thread;
-    public static Vector2D gravity = new Vector2D(0, 100);
+    Thread thread;
+    public static Vector2D gravity = new Vector2D(0, 80);
     List<SoftBody> softBodies;
+
+    // These can be changed by the controller
+    public static boolean fillSofbtody = false;
+    public static boolean drawPoints = true;
+    public static boolean drawSprings = true;
 
     public SoftBodyModel() {
 
@@ -40,7 +45,7 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
                 // set random color
                 X += 100;
-                // Y += 10;
+                Y += 13;
                 softBodies.add(softBody);
             }
             return;
@@ -81,7 +86,7 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
     @Override
     public void run() {
-        double drawInterval = 1000000000 / FPS; // FPS = 240
+        double drawInterval = 1000000000 / TICKRATE; // FPS = 240
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
