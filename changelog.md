@@ -56,7 +56,8 @@
 
 ### Fixed
 
-- The infamous Right leaning bias during collisions bug has finally been conqueured with the adition of higher precision variables for the rectangle class. This explains why it was more difficult to push a body from the right side to the left, because its bounding box was always smaller on the right side. so a maxBounds x position of 100.99 would be truncated to
+- The infamous Right leaning bias during collisions bug has finally been conqueured with the adition of higher precision variables for the rectangle class (used for bounding boxes)
+  . This explains why it was more difficult to push a body from the right side to the left, because its bounding box was always smaller on the right side. so a maxBounds x position of 100.99 would be truncated to
   100, which means if an edge was flat past the bounding box it would be impossible to push the body to the left. This is no longer the case. To make sure this definitely isn't still happening I could also add a slight margin to the bounding box, but I don't think it's necessary. Anyways this was bothering me forever so I'm very excited that this is finally fixed.
 
 ### TODO:
