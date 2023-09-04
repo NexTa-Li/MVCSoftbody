@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -359,11 +358,11 @@ public class SoftBody implements ReadOnlySoftBody {
         ArrayList<Vector2D> ForceSaved = new ArrayList<Vector2D>();
         ArrayList<Vector2D> VelocitySaved = new ArrayList<Vector2D>();
 
-        // Reset the bounding box values
-        // xMin = points.get(0).getPosition().getX();
-        // xMax = points.get(0).getPosition().getX();
-        // yMin = points.get(0).getPosition().getY();
-        // yMax = points.get(0).getPosition().getY();
+        // reset bounding box
+        xMin = Double.MAX_VALUE;
+        xMax = Double.MIN_VALUE;
+        yMin = Double.MAX_VALUE;
+        yMax = Double.MIN_VALUE;
 
         for (int i = 0; i < NUM_POINTS; i++) {
             // handle friction
@@ -381,34 +380,21 @@ public class SoftBody implements ReadOnlySoftBody {
 
             points.get(i).addPosition(deltaRotationX, deltaRotationY);
 
-            // keep track of min and max values for bounding box
             xMin = Math.min(xMin, points.get(i).getPositionX());
             xMax = Math.max(xMax, points.get(i).getPositionX());
             yMin = Math.min(yMin, points.get(i).getPositionY());
             yMax = Math.max(yMax, points.get(i).getPositionY());
-
-            // assign the bounding box values
-            boundingBox.x = xMin;
-            boundingBox.y = yMin;
-            boundingBox.width = xMax - xMin;
-            boundingBox.height = yMax - yMin;
-
-            handleSoftBodyCollisions(i);
-            handleRigidCollisions(i);
-            handlePointCollisions(i);
-
         }
-
         // assign the bounding box values
-        // boundingBox.x = xMin;
-        // boundingBox.y = yMin;
-        // boundingBox.width = xMax - xMin;
-        // boundingBox.height = yMax - yMin;
+        boundingBox.x = xMin;
+        boundingBox.y = yMin;
+        boundingBox.width = xMax - xMin;
+        boundingBox.height = yMax - yMin;
 
         accumulateForces();
 
         for (int i = 0; i < NUM_POINTS; i++) {
-            applyFriction(i);
+
             double dvx = (points.get(i).getForceX() + ForceSaved.get(i).getX()) / SOFTBODY_MASS * ModelConfig.timestep;
             double dvy = (points.get(i).getForceY() + ForceSaved.get(i).getY()) / SOFTBODY_MASS * ModelConfig.timestep;
 
@@ -421,21 +407,12 @@ public class SoftBody implements ReadOnlySoftBody {
             points.get(i).addPosition(deltaRotationX, deltaRotationY);
 
             // keep track of min and max values for bounding box
-            xMin = Math.min(xMin, points.get(i).getPositionX());
-            xMax = Math.max(xMax, points.get(i).getPositionX());
-            yMin = Math.min(yMin, points.get(i).getPositionY());
-            yMax = Math.max(yMax, points.get(i).getPositionY());
-
-            // assign the bounding box values
-            boundingBox.x = xMin;
-            boundingBox.y = yMin;
-            boundingBox.width = xMax - xMin;
-            boundingBox.height = yMax - yMin;
 
             handleSoftBodyCollisions(i);
             handleRigidCollisions(i);
             handlePointCollisions(i);
         }
+
     }
 
     /**
@@ -665,7 +642,6 @@ public class SoftBody implements ReadOnlySoftBody {
 
             points.get(p1).setVelocity(vx1, vy1);
             points.get(p2).setVelocity(vx2, vy2);
-
         }
     }
 

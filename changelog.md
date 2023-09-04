@@ -70,3 +70,9 @@
 - `Change` the display implementation so that `view` handles all the drawing instead of telling each softbody to draw itself.
 
 - Use the new `isMerged()` method to prevent softbodies from getting trapped inside each other
+
+## [Version 1.0.1] - 2023-09-04
+
+### Changed
+
+- `integrateHuen()` in `SoftBody.java`: Removed the 2nd call of collision resolver methods, and also changed the bounding box tracking from being in both loops to only after the points are moved in the 2nd loop. This is because the bounding box is only needed after the points are moved, and it is more efficient to only calculate it once.

@@ -14,13 +14,13 @@ import view.ViewConfig;
 
 public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
-    public static Vector2D gravity = new Vector2D(0, 250);
+    public static Vector2D gravity = new Vector2D(0, 60);
     List<SoftBody> softBodies;
     Thread thread;
 
     // graphical settings that can be changed by the controller
-    public static boolean fillSofbtody = false;
-    public static boolean drawPoints = true;
+    public static boolean fillSofbtody = true;
+    public static boolean drawPoints = false;
     public static boolean drawSprings = true;
     public static boolean drawBoundingBox = false;
 
