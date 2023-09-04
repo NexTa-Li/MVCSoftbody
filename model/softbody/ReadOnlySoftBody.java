@@ -3,9 +3,8 @@ package model.softbody;
 import java.util.ArrayList;
 
 import model.masspoint.ReadOnlyMassPoint;
-
+import model.geometry.Rectangle;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 
 public interface ReadOnlySoftBody {
     // Bare minimum for now

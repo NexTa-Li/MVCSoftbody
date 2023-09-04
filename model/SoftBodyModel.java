@@ -2,8 +2,11 @@ package model;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.ArrayList;
+import java.util.HashSet;
 
+import model.geometry.Point2D;
 import model.geometry.Vector2D;
 import model.softbody.ReadOnlySoftBody;
 import model.softbody.SoftBody;
@@ -11,14 +14,15 @@ import view.ViewConfig;
 
 public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
-    Thread thread;
-    public static Vector2D gravity = new Vector2D(0, 80);
+    public static Vector2D gravity = new Vector2D(0, 250);
     List<SoftBody> softBodies;
+    Thread thread;
 
-    // These can be changed by the controller
+    // graphical settings that can be changed by the controller
     public static boolean fillSofbtody = false;
     public static boolean drawPoints = true;
     public static boolean drawSprings = true;
+    public static boolean drawBoundingBox = false;
 
     public SoftBodyModel() {
 
@@ -52,7 +56,6 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
         }
 
         // Random positions, but with a seed
-
         Random random = new Random();
         random.setSeed(3);
 

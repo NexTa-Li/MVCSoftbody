@@ -92,4 +92,32 @@ public class SoftBodyUtil {
         return new Point2D(closestX, closestY);
     }
 
+    /**
+     * checks if the centre of 2 softbodies are within 5 units of each other and
+     * returns true if they are, false otherwise.
+     * 
+     * <p>
+     * if the centre of both bounding boxes are within 5 units of each other they
+     * are merged, where 5 units is the margin of error, since no 2 bodies bounding
+     * boxes centres will ever be within 5 units of each other
+     * </p>
+     * 
+     * @param body  the first softbody
+     * @param other the second softbody
+     * @return true if the softbodies are merged, false otherwise
+     */
+    public static boolean isMerged(SoftBody body, SoftBody other) {
+        if (body == other) {
+            return true;
+        }
+
+        Point2D bodyCentre = new Point2D(body.getBoundingBox().getCenterX(), body.getBoundingBox().getCenterY());
+        Point2D otherCentre = new Point2D(other.getBoundingBox().getCenterX(), other.getBoundingBox().getCenterY());
+
+        if (bodyCentre.distance(otherCentre) > 5) {
+            return false;
+        }
+
+        return true;
+    }
 }

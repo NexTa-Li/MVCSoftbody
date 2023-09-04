@@ -35,3 +35,38 @@
 ### Removed
 
 - `accumulateSoftBodyCollisionForce()`: Removed this method. It may be added back in the future but for now an implementation that doesn't require it is being explored.
+
+## [Version 1.0.0] - 2023-09-04
+
+### Added
+
+- `isMerged()` in `SoftBodyUtil.java`: Added a method that returns true if a softbody is inside of another softbody by checking how far apart the centre of their bounding boxes are.
+
+- `Rectangle.java`: Added a class that represents a rectangle with double precision.
+
+- `drawBoundingBox` bool in `SoftBodyModel.java`: Added a boolean that controls whether or not the bounding box is drawn.
+
+### Changed
+
+- `createSoftBody()` in `SoftBody.java`: modified the method to keep track of the bounding box, this supports the new `isMerged()` method, so it can be used from the very first tick.
+
+- `getBoundingBox()` in `SoftBody.java`: implemented the method, returns the bounding box of the softbody.
+
+- All `int` variables for bounding box calculations in `SoftBody.java` to `double` variables, and converted the bounding box from `java.awt.Rectangle` to `Rectangle.java`.
+
+### Fixed
+
+- The infamous Right leaning bias during collisions bug has finally been conqueured with the adition of higher precision variables for the rectangle class. This explains why it was more difficult to push a body from the right side to the left, because its bounding box was always smaller on the right side. so a maxBounds x position of 100.99 would be truncated to
+  100, which means if an edge was flat past the bounding box it would be impossible to push the body to the left. This is no longer the case. To make sure this definitely isn't still happening I could also add a slight margin to the bounding box, but I don't think it's necessary. Anyways this was bothering me forever so I'm very excited that this is finally fixed.
+
+### TODO:
+
+- `Test` that the new bounding box is working as intended.
+
+- `Test` that the new `isMerged()` method is working as intended.
+
+- `Test` that `closestPointOnLineSegment()` in `SoftBodyUtil.java` is working as intended.
+
+- `Change` the display implementation so that `view` handles all the drawing instead of telling each softbody to draw itself.
+
+- Use the new `isMerged()` method to prevent softbodies from getting trapped inside each other

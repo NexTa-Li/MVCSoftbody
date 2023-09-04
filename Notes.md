@@ -27,11 +27,19 @@
 
 - Create a CollisionHandler Utility class, the code will be a little cleaner.
 
+### Friction changes
+
+- change friction so that there is also an Air friction force applied every tick unless the point is already collided with a rigid surface.
+
 ### Collision Changes:
 
 - In general the collisions should probably be handled in a different way, for example if one body is colliding with another, then the other body should be notified of the collision and then it should handle it.
 
 - Currently a colliding point will move the edge points both a different amount depending on how far each is from the closest point. This is fine but due to the rest of the implementation, specifically how check collision iterates through each edge
+
+### Bounding Box:
+
+- create Rectangle class with doubles instead of ints, I suspect that the bounding box is causing some missed collisions due to rounding errors, especially when there are many bodies packed together.
 
 # Bugs
 

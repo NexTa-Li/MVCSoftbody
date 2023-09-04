@@ -4,8 +4,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +14,7 @@ import model.SoftBodyModel;
 import model.Spring;
 import model.geometry.Point2D;
 import model.geometry.Vector2D;
+import model.geometry.Rectangle;
 import model.masspoint.MassPoint;
 import model.masspoint.ReadOnlyMassPoint;
 import view.ViewConfig;
@@ -99,7 +100,7 @@ public class SoftBody implements ReadOnlySoftBody {
 
         edgePointIndices = new int[3]; // find a better soln
 
-        boundingBox = new Rectangle((int) x, (int) y, (int) radius * 2, (int) radius * 2); // find a better soln
+        boundingBox = new Rectangle(x, y, 1, 1); // bounding box is at the centre of the softbody
 
         createSoftBody(x, y, radius);
     }
@@ -129,7 +130,19 @@ public class SoftBody implements ReadOnlySoftBody {
             position.setX(radius * Math.cos(2 * Math.PI * i / NUM_POINTS) + x);
             position.setY(radius * Math.sin(2 * Math.PI * i / NUM_POINTS) + y);
             points.add(new MassPoint(position));
+
+            // keep track of the bounding box
+            xMin = Math.min(xMin, position.getX());
+            xMax = Math.max(xMax, position.getX());
+            yMin = Math.min(yMin, position.getY());
+            yMax = Math.max(yMax, position.getY());
         }
+
+        // assign the bounding box values
+        boundingBox.x = xMin;
+        boundingBox.y = yMin;
+        boundingBox.width = xMax - xMin;
+        boundingBox.height = yMax - yMin;
 
         // create springs
         for (int i = 0; i < NUM_POINTS - 1; i++) {
@@ -165,7 +178,6 @@ public class SoftBody implements ReadOnlySoftBody {
         accumulateGravityForce();
         accumulateSpringForce();
         accumulatePressureForce();
-        // accumulateSoftBodyCollisionForce();
     }
 
     /**
@@ -347,16 +359,15 @@ public class SoftBody implements ReadOnlySoftBody {
         ArrayList<Vector2D> ForceSaved = new ArrayList<Vector2D>();
         ArrayList<Vector2D> VelocitySaved = new ArrayList<Vector2D>();
 
-        // bounding box
-        xMin = points.get(0).getPosition().getX();
-        xMax = points.get(0).getPosition().getX();
-        yMin = points.get(0).getPosition().getY();
-        yMax = points.get(0).getPosition().getY();
+        // Reset the bounding box values
+        // xMin = points.get(0).getPosition().getX();
+        // xMax = points.get(0).getPosition().getX();
+        // yMin = points.get(0).getPosition().getY();
+        // yMax = points.get(0).getPosition().getY();
 
         for (int i = 0; i < NUM_POINTS; i++) {
             // handle friction
-            // applyFriction(i);
-
+            applyFriction(i);
             ForceSaved.add(new Vector2D(points.get(i).getForce()));
             VelocitySaved.add(new Vector2D(points.get(i).getVelocity()));
 
@@ -376,21 +387,28 @@ public class SoftBody implements ReadOnlySoftBody {
             yMin = Math.min(yMin, points.get(i).getPositionY());
             yMax = Math.max(yMax, points.get(i).getPositionY());
 
+            // assign the bounding box values
+            boundingBox.x = xMin;
+            boundingBox.y = yMin;
+            boundingBox.width = xMax - xMin;
+            boundingBox.height = yMax - yMin;
+
             handleSoftBodyCollisions(i);
             handleRigidCollisions(i);
             handlePointCollisions(i);
+
         }
 
         // assign the bounding box values
-        boundingBox.x = (int) xMin;
-        boundingBox.y = (int) yMin;
-        boundingBox.width = (int) (xMax - xMin);
-        boundingBox.height = (int) (yMax - yMin);
+        // boundingBox.x = xMin;
+        // boundingBox.y = yMin;
+        // boundingBox.width = xMax - xMin;
+        // boundingBox.height = yMax - yMin;
 
         accumulateForces();
 
         for (int i = 0; i < NUM_POINTS; i++) {
-            // applyFriction(i);
+            applyFriction(i);
             double dvx = (points.get(i).getForceX() + ForceSaved.get(i).getX()) / SOFTBODY_MASS * ModelConfig.timestep;
             double dvy = (points.get(i).getForceY() + ForceSaved.get(i).getY()) / SOFTBODY_MASS * ModelConfig.timestep;
 
@@ -401,6 +419,18 @@ public class SoftBody implements ReadOnlySoftBody {
             deltaRotationY = points.get(i).getVelocityY() * ModelConfig.timestep;
 
             points.get(i).addPosition(deltaRotationX, deltaRotationY);
+
+            // keep track of min and max values for bounding box
+            xMin = Math.min(xMin, points.get(i).getPositionX());
+            xMax = Math.max(xMax, points.get(i).getPositionX());
+            yMin = Math.min(yMin, points.get(i).getPositionY());
+            yMax = Math.max(yMax, points.get(i).getPositionY());
+
+            // assign the bounding box values
+            boundingBox.x = xMin;
+            boundingBox.y = yMin;
+            boundingBox.width = xMax - xMin;
+            boundingBox.height = yMax - yMin;
 
             handleSoftBodyCollisions(i);
             handleRigidCollisions(i);
@@ -653,8 +683,7 @@ public class SoftBody implements ReadOnlySoftBody {
      * ray casting will not work for concave shapes. This is important since the
      * soft body will be able to deform into concave shapes.
      * 
-     * TODO: rework this method to work with concave shapes, and also rework the
-     * solution for checking whether the closest point is a vertex or an edge
+     * TODO: rework checking whether the closest point is a vertex or an edge
      * 
      * @param position the position of the point to check
      * @param other    the soft body to check against
@@ -699,11 +728,9 @@ public class SoftBody implements ReadOnlySoftBody {
                 continue;
             }
 
-            if (position.getY() == edgeEnd.getY()) {
-                continue;
+            if (position.getY() != edgeEnd.getY()) {
+                intersectionCount++;
             }
-
-            intersectionCount++;
         }
 
         // If the number of intersections is odd, then the point is inside the soft body
@@ -745,8 +772,7 @@ public class SoftBody implements ReadOnlySoftBody {
 
     @Override
     public Rectangle getBoundingBox() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getBoundingBox'");
+        return this.boundingBox; // Privacy sacrifice for performance
     }
 
     @Override
@@ -783,6 +809,11 @@ public class SoftBody implements ReadOnlySoftBody {
 
         }
 
+        // draw bounding box
+        if (SoftBodyModel.drawBoundingBox) {
+            g.setColor(Color.green);
+            g.drawRect(boundingBox.X(), boundingBox.Y(), boundingBox.width(), boundingBox.height());
+        }
     }
 
     public void keyPressed(KeyEvent e) {
