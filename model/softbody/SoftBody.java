@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -407,7 +408,6 @@ public class SoftBody implements ReadOnlySoftBody {
             points.get(i).addPosition(deltaRotationX, deltaRotationY);
 
             // keep track of min and max values for bounding box
-
             handleSoftBodyCollisions(i);
             handleRigidCollisions(i);
             handlePointCollisions(i);
@@ -473,12 +473,23 @@ public class SoftBody implements ReadOnlySoftBody {
             double o_vx = softBodies.get(j).points.get(p1).getVelocityX();
             double o_vy = softBodies.get(j).points.get(p1).getVelocityY();
 
+            n.divide(2.0);
+
+            // Calculate new positions for each point
+            double newX1 = closestPoint.getX() + n.getX();
+            double newY1 = closestPoint.getY() + n.getY();
+
+            double newX2 = softBodies.get(j).points.get(p1).getPositionX() + n.getX();
+            double newY2 = softBodies.get(j).points.get(p1).getPositionY() + n.getY();
+
             // handle vertex collisions
             if (p2 == -1) {
                 System.out.println("Handling vertex collision with: " + j);
-                n.normalize();
-                points.get(i).setPosition(closestPoint.getX(), closestPoint.getY());
 
+                points.get(i).setPosition(newX1, newY1);
+                softBodies.get(j).points.get(p1).setPosition(newX2, newY2);
+
+                n.normalize();
                 // calculate impulse
                 double p = 2 * ((vx * n.getX() + vy * n.getY()) - (o_vx * n.getX() + o_vy *
                         n.getY()))
@@ -500,15 +511,6 @@ public class SoftBody implements ReadOnlySoftBody {
 
                 continue; // skip the rest
             }
-
-            n.divide(2.0);
-
-            // Calculate new positions for each point
-            double newX1 = closestPoint.getX() + n.getX();
-            double newY1 = closestPoint.getY() + n.getY();
-
-            double newX2 = softBodies.get(j).points.get(p1).getPositionX() + n.getX();
-            double newY2 = softBodies.get(j).points.get(p1).getPositionY() + n.getY();
 
             double newX3 = softBodies.get(j).points.get(p2).getPositionX() + n.getX();
             double newY3 = softBodies.get(j).points.get(p2).getPositionY() + n.getY();
@@ -655,12 +657,6 @@ public class SoftBody implements ReadOnlySoftBody {
      * intersections between the ray and the edges of the soft body. if the number
      * of intersections is odd, then the point is inside the soft body.
      * 
-     * This method will need to be reworked to full accomodate concave shapes since
-     * ray casting will not work for concave shapes. This is important since the
-     * soft body will be able to deform into concave shapes.
-     * 
-     * TODO: rework checking whether the closest point is a vertex or an edge
-     * 
      * @param position the position of the point to check
      * @param other    the soft body to check against
      * @return true if the point is inside the soft body, false otherwise
@@ -671,14 +667,17 @@ public class SoftBody implements ReadOnlySoftBody {
             return false;
         }
 
-        Point2D rayStart = new Point2D(position.getX(), 0);
+        Line2D ray = new Line2D.Double(position.getX(), 0, position.getX(), position.getY());
 
         int points = other.points.size();
         int intersectionCount = 0;
 
+        // set the closest point to the first point in the list
+        closestPoint = new Point2D(other.points.get(0).getPosition());
+
         for (int i = 0; i < points; i++) {
-            Point2D edgeStart = new Point2D(other.points.get(i).getPosition());
-            Point2D edgeEnd = new Point2D(other.points.get((i + 1) % points).getPosition());
+            Point2D edgeStart = other.points.get(i).getPosition();
+            Point2D edgeEnd = other.points.get((i + 1) % points).getPosition();
 
             Point2D tempClosestPoint = SoftBodyUtil.closestPointOnLineSegment(position, edgeStart, edgeEnd);
 
@@ -686,13 +685,12 @@ public class SoftBody implements ReadOnlySoftBody {
             double oldDistance = position.distance(closestPoint);
 
             // check if the closest point is on an edge and closer than the previous closest
-            if (tempDistance <= oldDistance || !collided) {
+            if (tempDistance <= oldDistance) {
                 edgePointIndices[0] = i;
-                edgePointIndices[1] = (i + 1) % points;
+                edgePointIndices[1] = tempClosestPoint.equals(edgeStart) ? -1 : (i + 1) % points;
 
                 // this should probably only be set if theres actually a collision
                 closestPoint.setLocation(tempClosestPoint.getX(), tempClosestPoint.getY());
-                collided = true;
             }
 
             /*
@@ -700,7 +698,7 @@ public class SoftBody implements ReadOnlySoftBody {
              * Also check if the ray is at the same height as a point on
              * the edge, if it is, then the next edge will be intersected, so we skip this
              */
-            if (!SoftBodyUtil.checkIntersection(rayStart, position, edgeStart, edgeEnd)) {
+            if (!SoftBodyUtil.checkIntersection(ray, edgeStart, edgeEnd)) {
                 continue;
             }
 
@@ -710,30 +708,7 @@ public class SoftBody implements ReadOnlySoftBody {
         }
 
         // If the number of intersections is odd, then the point is inside the soft body
-        if (intersectionCount % 2 == 1) {
-
-            // naive approach to check if the closest point is a vertex
-            for (int i = 0; i < points; i++) {
-                Point2D edgeStart = new Point2D(other.points.get(i).getPosition());
-
-                double oldDistance = position.distance(closestPoint);
-                double closestEdgePointDistance = position.distance(edgeStart);
-
-                // check if the closest point is a vertex and closer than the previous closest
-                if (closestEdgePointDistance < oldDistance) {
-                    edgePointIndices[0] = i;
-                    edgePointIndices[1] = -1;
-
-                    // this should probably only be set if theres actually a collision
-                    closestPoint.setLocation(edgeStart.getX(), edgeStart.getY());
-                    System.out.println("Closest point is a vertex");
-                }
-            }
-            return true;
-        }
-        // otherwise, the point is outside the soft body, so no collision
-        collided = false;
-        return false;
+        return intersectionCount % 2 == 1;
     }
 
     @Override

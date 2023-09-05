@@ -2,11 +2,8 @@ package model;
 
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.ArrayList;
-import java.util.HashSet;
 
-import model.geometry.Point2D;
 import model.geometry.Vector2D;
 import model.softbody.ReadOnlySoftBody;
 import model.softbody.SoftBody;
@@ -14,7 +11,7 @@ import view.ViewConfig;
 
 public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
-    public static Vector2D gravity = new Vector2D(0, 60);
+    public static Vector2D gravity = new Vector2D(0, 0);
     List<SoftBody> softBodies;
     Thread thread;
 
@@ -73,6 +70,7 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
     public void idle() {
         for (int i = 0; i < softBodies.size(); i++) {
+
             softBodies.get(i).idle();
         }
 
@@ -94,6 +92,12 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
         long lastTime = System.nanoTime();
         long currentTime;
 
+        long time = 0;
+        long totalTime = 0;
+
+        int benchmarkInterval = 1000;
+        int count = 1;
+
         while (thread != null) {
             currentTime = System.nanoTime();
 
@@ -103,8 +107,12 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
             // Update the game logic when enough time has passed for a frame
             if (delta >= 1.0) {
+                long begin = System.nanoTime(); // Testing how long the idle method takes
                 idle(); // Update game logic and rendering
                 delta--;
+
+                long end = System.nanoTime();
+                time += end - begin;
             }
 
             // Calculate the time to sleep in order to achieve the desired frame rate
@@ -116,6 +124,15 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
                     e.printStackTrace();
                 }
             }
+
+            if (count % benchmarkInterval == 0) {
+                System.out.println("Idle method took " + time / 1e6 + " ms");
+                totalTime += time;
+                System.out.println("Average time: " + ((totalTime) / 1e6) / count + " ms");
+                time = 0;
+            }
+
+            count++;
         }
     }
 

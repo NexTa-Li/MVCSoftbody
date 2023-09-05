@@ -1,18 +1,16 @@
-# Change Log
-
-## [Version 0.0.1] - 2023-09-02
+# **[Version 0.0.1]** - 2023-09-02
 
 ### Changed
 
 - `Debugging Configuration`: Changed the project from debugging config so that it runs as intended via Driver.java
 
-## [Version 0.0.2] - 2023-09-02
+# **[Version 0.0.2]** - 2023-09-02
 
 ### Removed
 
 - `Artifacts` in `checkCollisions()` & `handleSoftbodyCollisions()`: Removing some code artifacts that were left over from old ideas/ debugging.
 
-## [Version 0.0.3] - 2023-09-02
+# **[Version 0.0.3]** - 2023-09-02
 
 ### Added
 
@@ -36,7 +34,7 @@
 
 - `accumulateSoftBodyCollisionForce()`: Removed this method. It may be added back in the future but for now an implementation that doesn't require it is being explored.
 
-## [Version 1.0.0] - 2023-09-04
+## **[Version 1.0.0]** - 2023-09-04
 
 ### Added
 
@@ -72,8 +70,24 @@
 
 - Use the new `isMerged()` method to prevent softbodies from getting trapped inside each other
 
-## [Version 1.0.1] - 2023-09-04
+# **[Version 1.0.1]** - 2023-09-04
 
 ### Changed
 
 - `integrateHuen()` in `SoftBody.java`: Removed the 2nd call of collision resolver methods, and also changed the bounding box tracking from being in both loops to only after the points are moved in the 2nd loop. This is because the bounding box is only needed after the points are moved, and it is more efficient to only calculate it once.
+
+# **[Version 1.0.2]** - 2023-09-05
+
+### Changed
+
+- `checkCollision()` in `SoftBody.java`: Cleaned up the method, made some optimizations.
+
+- `checkCollision()` in `SoftBody.java`: Made a change to how the method detects whether a vertex collision occured (removing the extra loop with comments about it being a naive approach), method should be close to twice as fast (still needs to be tested).
+
+- **NOTE**: for some reason the above changes made the program 10% slower but the bodies are significantly more stable. I don't understand why at all, but the difference in stability is so significant that I'm going to keep the changes.
+
+- `checkCollision()` in `SoftBody.java`: got rid of the collided boolean, it was unnecessary.
+
+- `checkIntersection()` in `SoftBodyUtil.java`: Changed the parameters to take a line segment instead of two points for the ray. This is because the ray is always a line segment, and it makes the method more readable. Minimal performance gain.
+
+- `handleSoftBodyCollisions()` in `SoftBody.java`: small tweak to the handle vertex collisions portion of the method.

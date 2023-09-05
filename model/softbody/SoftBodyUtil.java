@@ -15,8 +15,7 @@ public class SoftBodyUtil {
             return false;
         }
 
-        Point2D rayStart = new Point2D(0, position.getY());
-        Point2D rayEnd = new Point2D(position);
+        Line2D ray = new Line2D.Double(0, position.getY(), position.getX(), position.getY());
 
         int points = other.points.size();
         int intersectionCount = 0;
@@ -24,7 +23,7 @@ public class SoftBodyUtil {
             Point2D edgeStart = new Point2D(other.points.get(i).getPosition());
             Point2D edgeEnd = new Point2D(other.points.get((i + 1) % points).getPosition());
 
-            if (SoftBodyUtil.checkIntersection(rayStart, rayEnd, edgeStart, edgeEnd)) {
+            if (SoftBodyUtil.checkIntersection(ray, edgeStart, edgeEnd)) {
                 intersectionCount++;
             }
         }
@@ -49,9 +48,8 @@ public class SoftBodyUtil {
 
     // TODO: Fix this method to work when the horizontal ray is at the same y
     // coordinate as the invading point
-    public static boolean checkIntersection(Point2D rayStart, Point2D rayEnd, Point2D edgeStart, Point2D edgeEnd) {
+    public static boolean checkIntersection(Line2D ray, Point2D edgeStart, Point2D edgeEnd) {
 
-        Line2D ray = new Line2D.Double(rayStart.getX(), rayStart.getY(), rayEnd.getX(), rayEnd.getY());
         Line2D edge = new Line2D.Double(edgeStart.getX(), edgeStart.getY(), edgeEnd.getX(), edgeEnd.getY());
 
         return ray.intersectsLine(edge);

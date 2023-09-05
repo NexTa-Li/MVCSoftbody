@@ -4,11 +4,11 @@ public interface ModelConfig {
     // Physical constants
     static final int FILL_DURATION = 500; // the higher, the better (helps with volume calculations)
     static final double USER_FORCE = 250;
-    static final double BOUNCINESS = 0.99; // 0.90 is a good value
+    static final double BOUNCINESS = 0.97; // 0.95 is a good value
     static final double SURFACE_FRICTION_COEFFICIENT = 0.02; // 0.01 is a good value
-    static final int NUM_SOFTBODIES = 80;
+    static final int NUM_SOFTBODIES = 20;
 
-    static final int NUM_POINTS = 12;
+    static final int NUM_POINTS = 32;
     static final double RADIUS = 0.1; // Radius of the softbodies during first tick, and their springs resting length
     static final double MASS = 0.5; // collisions are more reliable with smaller mass
     static final double SPRING_CONSTANT = 700.0;
