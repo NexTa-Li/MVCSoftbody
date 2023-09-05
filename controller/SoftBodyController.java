@@ -36,7 +36,7 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
     static boolean mouseReleased = false;
     static boolean mouseInPanel = false;
 
-    static int selectedSoftbody = 48; // index of the selected softbody
+    static int selectedSoftbody = 0; // index of the selected softbody
 
     public SoftBodyController(SoftBodyModel model) {
         this.model = model;
