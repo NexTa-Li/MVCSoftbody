@@ -34,7 +34,6 @@ public class SoftBody implements ReadOnlySoftBody {
 
     double pressure = 0.0;
     Point2D closestPoint = new Point2D();
-    boolean collided = false;
 
     Rectangle boundingBox;
 
@@ -447,7 +446,6 @@ public class SoftBody implements ReadOnlySoftBody {
             }
 
             // skip if theres no collision
-            this.collided = false; // fix
             if (!checkCollision(points.get(i).getPosition(), softBodies.get(j))) {
                 continue;
             }
@@ -533,11 +531,11 @@ public class SoftBody implements ReadOnlySoftBody {
             double p = 2 * ((vx * n.getX() + vy * n.getY()) - (edgeVx * n.getX() + edgeVy * n.getY()))
                     / (SOFTBODY_MASS + softBodies.get(j).SOFTBODY_MASS);
 
-            double vx1 = vx - (p * SOFTBODY_MASS * n.getX());
-            double vy1 = vy - (p * SOFTBODY_MASS * n.getY());
+            double vx1 = vx - (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
+            double vy1 = vy - (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
 
-            double vx2 = edgeVx + (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
-            double vy2 = edgeVy + (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
+            double vx2 = edgeVx + (p * SOFTBODY_MASS * n.getX());
+            double vy2 = edgeVy + (p * SOFTBODY_MASS * n.getY());
 
             vx1 *= ModelConfig.BOUNCINESS;
             vy1 *= ModelConfig.BOUNCINESS;

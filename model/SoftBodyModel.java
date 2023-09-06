@@ -2,23 +2,27 @@ package model;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.ArrayList;
+import java.util.HashSet;
 
+import model.geometry.Point2D;
 import model.geometry.Vector2D;
 import model.softbody.ReadOnlySoftBody;
 import model.softbody.SoftBody;
+import model.softbody.SoftBodyUtil;
 import view.ViewConfig;
 
 public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
-    public static Vector2D gravity = new Vector2D(0, 0);
+    public static Vector2D gravity = new Vector2D(0, 105);
     List<SoftBody> softBodies;
     Thread thread;
 
     // graphical settings that can be changed by the controller
     public static boolean fillSofbtody = true;
     public static boolean drawPoints = false;
-    public static boolean drawSprings = true;
+    public static boolean drawSprings = false;
     public static boolean drawBoundingBox = false;
 
     public SoftBodyModel() {
@@ -45,7 +49,7 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
                         SPRING_DAMPING, FINAL_PRESSURE, softBodies);
 
                 // set random color
-                X += 100;
+                X += 300;
                 Y += 13;
                 softBodies.add(softBody);
             }
@@ -56,15 +60,28 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
         Random random = new Random();
         random.setSeed(3);
 
-        for (int i = 0; i < NUM_SOFTBODIES; i++) {
+        int i = 0;
+        int numBodies = NUM_SOFTBODIES;
+        while (i < numBodies) {
 
             int rX = (random.nextInt(ViewConfig.PANEL_WIDTH));
             int rY = (random.nextInt(ViewConfig.PANEL_HEIGHT));
 
+            for (int j = 0; j < i; j++) {
+                if (i - 1 == j)
+                    continue;
+
+                if (SoftBodyUtil.isMerged(softBodies.get(i - 1), softBodies.get(j))) {
+                    System.out.println("Softbody " + i + " and " + j + " are merged");
+                    numBodies++;
+                    break;
+                }
+            }
             SoftBody softBody = new SoftBody(rX, rY, NUM_POINTS, RADIUS, MASS, SPRING_CONSTANT,
                     SPRING_DAMPING, FINAL_PRESSURE, softBodies);
 
             softBodies.add(softBody);
+            i++;
         }
     }
 
@@ -74,9 +91,16 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
             softBodies.get(i).idle();
         }
 
-        for (int i = softBodies.size() - 1; i >= 0; i--) {
-            // softBodies.get(i).idle();
-        }
+        // for (int i = 0; i < softBodies.size(); i++) {
+
+        // for (int j = 0; j < softBodies.size(); j++) {
+        // if (SoftBodyUtil.isMerged(softBodies.get(i), softBodies.get(j)) && i != j) {
+        // // System.out.println("damn");
+        // }
+
+        // }
+
+        // }
 
         // if (count % 800 == 0) {
         // gravity.multiplyY(-1);

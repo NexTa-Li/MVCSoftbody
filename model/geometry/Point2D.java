@@ -96,7 +96,9 @@ public class Point2D {
         }
 
         Point2D p = (Point2D) o;
-        return (p.getX() == this.x && p.getY() == this.y);
+
+        return (Double.doubleToLongBits(p.getX()) == Double.doubleToLongBits(this.x)
+                && Double.doubleToLongBits(p.getY()) == Double.doubleToLongBits(this.y));
     }
 
     @Override

@@ -91,3 +91,13 @@
 - `checkIntersection()` in `SoftBodyUtil.java`: Changed the parameters to take a line segment instead of two points for the ray. This is because the ray is always a line segment, and it makes the method more readable. Minimal performance gain.
 
 - `handleSoftBodyCollisions()` in `SoftBody.java`: small tweak to the handle vertex collisions portion of the method.
+
+# **[Version 1.0.3]** - 2023-09-06
+
+### Changed
+
+- `various constants` in `ModelConfig.java`: tweaked the constants to test the new collision changes.
+
+- `createSoftBodies()` in `SoftBodyModel.java`: added a temporary solution to prevent softbodies from being created inside each other. This will be replaced with a more robust solution in the future.
+
+- `eqauls()` in `Point2D.java`: slightly modified the contract.
