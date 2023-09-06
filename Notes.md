@@ -94,4 +94,18 @@
 - I can move handle softbody collisions to accumulate forces and change the resolved velocities to forces, this would mean resolving softbody collisions two times per idle call.
 - Update [ 2023-09-02 ]: this is driving me insane. it could be being caused by so many different things. Even a slight miscalculation in positions could cause a chain reaction of collisions permanently that could very easily be the reason why there is so much extra energy.
 
-# Math
+# Data Visualization Fork
+
+- <p> the trick with his visualisations was that they're animated in the time domain
+    so they move in X and Y position and by area, all animated on the time axis
+    if you left X and Y to collision (and leave time static for now) you can represent data as a "coloured ball pit"
+    then later allow changing their area based on a "time" slider
+    then you could later add stuff like extra data on tooltips
+    and the ability to click, drag, maybe lock in place the circles
+    so you can sort of move them about as you talk about the data 
+    something Hans Rosling's stuff couldn't do
+      </p>
+      <p>
+      so imagine giving a lecture on the populations of all the countries in the world over the last 100 years
+  each country is one circle with the country flag as the texture
+  </p>
