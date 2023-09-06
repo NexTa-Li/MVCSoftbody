@@ -41,6 +41,30 @@
 
 - create Rectangle class with doubles instead of ints, I suspect that the bounding box is causing some missed collisions due to rounding errors, especially when there are many bodies packed together.
 
+### physical changes during simulation
+
+- ability to increase/ decrease final pressure.
+
+- ability to increase/ decrease the spring resting length.
+
+- ability to increase/ decrease spring constant.
+
+- ability to increase/ decrease mass
+
+- **Note**: these changes will need some serious limitations according to every other physical value the body has.  
+
+### Ability to add subtract points on a body
+
+### Ability to add/ remove bodies during the simulation
+
+- adding a new body is simple.
+
+- removing a body is slightly difficult since each body paints itself. see ***Draw bodies in view***
+
+### Draw bodies in view
+
+- use the readonly list of softbodies to get the positions of the bodies instead of asking each body to draw itself each tick. The current implementation was only temporary and needs to be changed asap. 
+
 # Bugs
 
 - Two bodies at the exact same height can cause a missed collision, I suspect this is because the collision detector doesn't check for intersections through points
@@ -70,4 +94,18 @@
 - I can move handle softbody collisions to accumulate forces and change the resolved velocities to forces, this would mean resolving softbody collisions two times per idle call.
 - Update [ 2023-09-02 ]: this is driving me insane. it could be being caused by so many different things. Even a slight miscalculation in positions could cause a chain reaction of collisions permanently that could very easily be the reason why there is so much extra energy.
 
-# Math
+# Data Visualization Fork
+
+- <p> the trick with his visualisations was that they're animated in the time domain
+    so they move in X and Y position and by area, all animated on the time axis
+    if you left X and Y to collision (and leave time static for now) you can represent data as a "coloured ball pit"
+    then later allow changing their area based on a "time" slider
+    then you could later add stuff like extra data on tooltips
+    and the ability to click, drag, maybe lock in place the circles
+    so you can sort of move them about as you talk about the data 
+    something Hans Rosling's stuff couldn't do
+      </p>
+      <p>
+      so imagine giving a lecture on the populations of all the countries in the world over the last 100 years
+  each country is one circle with the country flag as the texture
+  </p>
