@@ -37,18 +37,6 @@
 
 - Currently a colliding point will move the edge points both a different amount depending on how far each is from the closest point. This is fine but due to the rest of the implementation, specifically how check collision iterates through each edge
 
-### physical changes during simulation
-
-- ability to increase/ decrease final pressure.
-
-- ability to increase/ decrease the spring resting length.
-
-- ability to increase/ decrease spring constant.
-
-- ability to increase/ decrease mass
-
-- **Note**: these changes will need some serious limitations according to every other physical value the body has.
-
 ### Ability to add subtract points on a body
 
 ### Ability to add/ remove bodies during the simulation
@@ -95,6 +83,18 @@
 ### Draw bodies in view
 
 - use the readonly list of softbodies to get the positions of the bodies instead of asking each body to draw itself each tick. The current implementation was only temporary and needs to be changed asap.
+
+### physical changes during simulation
+
+- ability to increase/ decrease final pressure.
+
+- ability to increase/ decrease the spring resting length.
+
+- ability to increase/ decrease spring constant.
+
+- ability to increase/ decrease mass
+
+- **Note**: these changes will need some serious limitations according to every other physical value the body has.
 
 # Data Visualization Fork
 

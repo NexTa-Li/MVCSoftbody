@@ -115,3 +115,13 @@
 ### Removed
 
 - `PaintComponent()` in `ReadOnlySoftBody.java` & `SoftBody.java`: Removed it since the view now draws the softbodies on its own based on model data.
+
+# **[Version 1.1.3]** - 2023-09-06
+
+### Added
+
+- `increase` & `decrease` in `SoftBody.java`: Added the ability to increase/ decrease spring constant, length or pressure of the selected softbody by pressing the `+` or `-` keys.
+
+- `massChange`, `pressureChange`, `springLengthChange` & `springConstantChange` in `SoftBody.java`: toggle each option by pressing `7, 8, 9, 0` respectively. then press `+` or `-` to increase or decrease the value.
+
+- `addLength()` in `Spring.java`

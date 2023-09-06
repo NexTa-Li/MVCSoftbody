@@ -21,24 +21,21 @@ public class SoftBody implements ReadOnlySoftBody {
     List<SoftBody> softBodies;
 
     final int NUM_POINTS;
-    final double SOFTBODY_MASS;
-    final double SPRING_CONSTANT;
     final double SPRING_DAMPING;
-    final double FINAL_PRESSURE;
+    double SOFTBODY_MASS;
+    double SPRING_CONSTANT;
+    double FINAL_PRESSURE;
+    double pressure = 0.0;
 
     int[] edgePointIndices;
-
-    double pressure = 0.0;
     Point2D closestPoint = new Point2D();
 
     Rectangle boundingBox;
 
     double xMin, xMax, yMin, yMax;
 
-    boolean keyUp = false;
-    boolean keyDown = false;
-    boolean keyLeft = false;
-    boolean keyRight = false;
+    boolean keyUp, keyDown, keyLeft, keyRight, increase, decrease;
+    boolean pressureChange, springLengthChange, springConstantChange, massChange;
 
     /*
      * Maintaining invariants
@@ -224,6 +221,15 @@ public class SoftBody implements ReadOnlySoftBody {
             return;
         }
 
+        if (massChange) {
+            if (increase) {
+                SOFTBODY_MASS += SOFTBODY_MASS / 100.0;
+            }
+            if (decrease) {
+                SOFTBODY_MASS -= SOFTBODY_MASS / 100.0;
+            }
+        }
+
         for (MassPoint massPoint : points) {
             massPoint.setForce(SoftBodyModel.gravity.getX(), SoftBodyModel.gravity.getY());
             massPoint.getForce().multiply(SOFTBODY_MASS); // F = m * a
@@ -258,6 +264,15 @@ public class SoftBody implements ReadOnlySoftBody {
         int p1, p2;
         double x1, x2, y1, y2, distance, force, velocityX, velocityY;
 
+        if (springConstantChange) {
+            if (increase) {
+                SPRING_CONSTANT += SPRING_CONSTANT / 100.0;
+            }
+            if (decrease) {
+                SPRING_CONSTANT -= SPRING_CONSTANT / 100.0;
+            }
+        }
+
         for (int i = 0; i < springs.size(); i++) {
             p1 = springs.get(i).getP1();
             p2 = springs.get(i).getP2();
@@ -290,12 +305,32 @@ public class SoftBody implements ReadOnlySoftBody {
                 // (perpendicular to spring, used for pressure calculations)
                 springs.get(i).setNormalVector(((y2 - y1) / distance), ((x1 - x2) / distance));
             }
+
+            if (springLengthChange) {
+                if (increase) {
+                    springs.get(i).addLength(springs.get(i).getLength() / 100.0);
+                }
+                if (decrease) {
+                    springs.get(i).addLength(-springs.get(i).getLength() / 100.0);
+                }
+            }
         }
     }
 
     void accumulatePressureForce() {
         int p1, p2;
         double x1, x2, y1, y2, distance, volume = 0.0;
+
+        if (pressureChange) {
+            if (increase) {
+                FINAL_PRESSURE += FINAL_PRESSURE / 100.0;
+            }
+            if (decrease) {
+                FINAL_PRESSURE -= FINAL_PRESSURE / 100.0;
+            }
+        }
+
+        pressure = FINAL_PRESSURE;
 
         for (int i = 0; i < springs.size(); i++) {
             p1 = springs.get(i).getP1();
@@ -729,6 +764,31 @@ public class SoftBody implements ReadOnlySoftBody {
             keyLeft = true;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT)
             keyRight = true;
+        if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_EQUALS)
+            increase = true;
+        if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_UNDERSCORE)
+            decrease = true;
+        if (e.getKeyCode() == KeyEvent.VK_7) {
+            System.out.println("Mass Change");
+            resetChangeVars();
+            massChange = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_8) {
+            System.out.println("Pressure Change");
+            resetChangeVars();
+            pressureChange = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_9) {
+            System.out.println("Spring Length Change");
+            resetChangeVars();
+            springLengthChange = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_0) {
+            System.out.println("Spring Constant Change");
+            resetChangeVars();
+            springConstantChange = true;
+        }
+
     }
 
     public void keyReleased(KeyEvent e) {
@@ -741,6 +801,17 @@ public class SoftBody implements ReadOnlySoftBody {
             keyLeft = false;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT)
             keyRight = false;
+        if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_EQUALS)
+            increase = false;
+        if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_UNDERSCORE)
+            decrease = false;
+    }
+
+    void resetChangeVars() {
+        massChange = false;
+        pressureChange = false;
+        springLengthChange = false;
+        springConstantChange = false;
     }
 
     /**

@@ -36,6 +36,10 @@ public class Spring {
         return this.length;
     }
 
+    public void addLength(double length) {
+        this.length += length;
+    }
+
     public Vector2D getNormalVector() {
         return new Vector2D(this.NormalVector);
     }

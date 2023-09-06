@@ -2,13 +2,13 @@ package model;
 
 public interface ModelConfig {
     // Physical constants
-    static final int FILL_DURATION = 10; // the higher, the better (helps with volume calculations)
+    static final int FILL_DURATION = 100; // the higher, the better (helps with volume calculations)
     static final double USER_FORCE = 250;
     static final double BOUNCINESS = 0.97; // 0.95 is a good value
     static final double SURFACE_FRICTION_COEFFICIENT = 0.02; // 0.01 is a good value
-    static final int NUM_SOFTBODIES = 100;
+    static final int NUM_SOFTBODIES = 5;
 
-    static final int NUM_POINTS = 16;
+    static final int NUM_POINTS = 32;
 
     /**
      * The Radius the softbody will try to maintain. This radius will not always be
@@ -19,7 +19,7 @@ public interface ModelConfig {
      * This means that the resting length of each spring is also
      * determined by this value.
      */
-    static final double RADIUS = 50.0;
+    static final double RADIUS = 5.0;
 
     /**
      * The Mass of each mass point in the softbody. This determines how much the
@@ -29,6 +29,8 @@ public interface ModelConfig {
      * 
      * As of 2023-09-05, a mass of 0.5 is a good value, since the smaller mass
      * values result in better collisions.
+     * 
+     * New findings show that a larger mass will allow a higher damping value.
      */
     static final double MASS = 0.5; // collisions are more reliable with smaller mass
 
