@@ -76,7 +76,7 @@
 
 - `integrateHuen()` in `SoftBody.java`: Removed the 2nd call of collision resolver methods, and also changed the bounding box tracking from being in both loops to only after the points are moved in the 2nd loop. This is because the bounding box is only needed after the points are moved, and it is more efficient to only calculate it once.
 
-# **[Version 1.0.2]** - 2023-09-05
+# **[Version 1.1.0]** - 2023-09-05
 
 ### Changed
 
@@ -92,7 +92,7 @@
 
 - `handleSoftBodyCollisions()` in `SoftBody.java`: small tweak to the handle vertex collisions portion of the method.
 
-# **[Version 1.0.3]** - 2023-09-06
+# **[Version 1.1.1]** - 2023-09-06
 
 ### Changed
 
