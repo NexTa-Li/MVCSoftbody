@@ -34,7 +34,7 @@
 
 - `accumulateSoftBodyCollisionForce()`: Removed this method. It may be added back in the future but for now an implementation that doesn't require it is being explored.
 
-## **[Version 1.0.0]** - 2023-09-04
+# **[Version 1.0.0]** - 2023-09-04
 
 ### Added
 
