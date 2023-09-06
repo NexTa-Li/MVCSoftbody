@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import model.masspoint.ReadOnlyMassPoint;
 import model.geometry.Rectangle;
-import java.awt.Graphics;
 
 public interface ReadOnlySoftBody {
     // Bare minimum for now
@@ -14,5 +13,7 @@ public interface ReadOnlySoftBody {
 
     public Rectangle getBoundingBox();
 
-    public void paintComponent(Graphics graphics);
+    public int[] getXArr();
+
+    public int[] getYArr();
 }

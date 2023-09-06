@@ -37,10 +37,6 @@
 
 - Currently a colliding point will move the edge points both a different amount depending on how far each is from the closest point. This is fine but due to the rest of the implementation, specifically how check collision iterates through each edge
 
-### Bounding Box:
-
-- create Rectangle class with doubles instead of ints, I suspect that the bounding box is causing some missed collisions due to rounding errors, especially when there are many bodies packed together.
-
 ### physical changes during simulation
 
 - ability to increase/ decrease final pressure.
@@ -51,7 +47,7 @@
 
 - ability to increase/ decrease mass
 
-- **Note**: these changes will need some serious limitations according to every other physical value the body has.  
+- **Note**: these changes will need some serious limitations according to every other physical value the body has.
 
 ### Ability to add subtract points on a body
 
@@ -59,11 +55,7 @@
 
 - adding a new body is simple.
 
-- removing a body is slightly difficult since each body paints itself. see ***Draw bodies in view***
-
-### Draw bodies in view
-
-- use the readonly list of softbodies to get the positions of the bodies instead of asking each body to draw itself each tick. The current implementation was only temporary and needs to be changed asap. 
+- removing a body is slightly difficult since each body paints itself. see **_Draw bodies in view_**
 
 # Bugs
 
@@ -93,6 +85,16 @@
 - I suspect this is due to handling the collisions inside of the integration, but if not in there then where else?
 - I can move handle softbody collisions to accumulate forces and change the resolved velocities to forces, this would mean resolving softbody collisions two times per idle call.
 - Update [ 2023-09-02 ]: this is driving me insane. it could be being caused by so many different things. Even a slight miscalculation in positions could cause a chain reaction of collisions permanently that could very easily be the reason why there is so much extra energy.
+
+# Implemented changes (from potential changes):
+
+### Bounding Box:
+
+- create Rectangle class with doubles instead of ints, I suspect that the bounding box is causing some missed collisions due to rounding errors, especially when there are many bodies packed together.
+
+### Draw bodies in view
+
+- use the readonly list of softbodies to get the positions of the bodies instead of asking each body to draw itself each tick. The current implementation was only temporary and needs to be changed asap.
 
 # Data Visualization Fork
 

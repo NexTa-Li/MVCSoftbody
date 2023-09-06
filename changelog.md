@@ -101,3 +101,17 @@
 - `createSoftBodies()` in `SoftBodyModel.java`: added a temporary solution to prevent softbodies from being created inside each other. This will be replaced with a more robust solution in the future.
 
 - `eqauls()` in `Point2D.java`: slightly modified the contract.
+
+# **[Version 1.1.1]** - 2023-09-06
+
+### Added
+
+- `getXArr() & getYArr()` in `ReadOnlySoftBody.java`: Added methods that return an array of the x and y positions of the points in the softbody, so that the view can draw the softbody as a polygon.
+
+### Changed
+
+- `SoftBody Drawing Methods`: Now view takes the information from the model and draws the softbodies as polygons instead of asking each softbody to draw itself.
+
+### Removed
+
+- `PaintComponent()` in `ReadOnlySoftBody.java` & `SoftBody.java`: Removed it since the view now draws the softbodies on its own based on model data.

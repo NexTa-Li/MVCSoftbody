@@ -1,9 +1,5 @@
 package model.softbody;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -394,7 +390,6 @@ public class SoftBody implements ReadOnlySoftBody {
         accumulateForces();
 
         for (int i = 0; i < NUM_POINTS; i++) {
-
             double dvx = (points.get(i).getForceX() + ForceSaved.get(i).getX()) / SOFTBODY_MASS * ModelConfig.timestep;
             double dvy = (points.get(i).getForceY() + ForceSaved.get(i).getY()) / SOFTBODY_MASS * ModelConfig.timestep;
 
@@ -482,7 +477,7 @@ public class SoftBody implements ReadOnlySoftBody {
 
             // handle vertex collisions
             if (p2 == -1) {
-                System.out.println("Handling vertex collision with: " + j);
+                // System.out.println("Handling vertex collision with: " + j);
 
                 points.get(i).setPosition(newX1, newY1);
                 softBodies.get(j).points.get(p1).setPosition(newX2, newY2);
@@ -724,47 +719,6 @@ public class SoftBody implements ReadOnlySoftBody {
         return this.boundingBox; // Privacy sacrifice for performance
     }
 
-    @Override
-    public void paintComponent(Graphics graphics) {
-        // draw softbody
-        Graphics2D g = (Graphics2D) graphics;
-        g.setStroke(new BasicStroke(2));
-
-        if (SoftBodyModel.fillSofbtody) {
-            g.setColor(Color.gray);
-            g.fillPolygon(getXArr(), getYArr(), NUM_POINTS);
-        }
-
-        if (SoftBodyModel.drawSprings) {
-            g.setColor(Color.WHITE);
-            for (int i = 0; i < NUM_POINTS; i++) {
-                g.drawLine((int) points.get(springs.get(i).getP1()).getPosition().getX(),
-                        (int) points.get(springs.get(i).getP1()).getPosition().getY(),
-                        (int) points.get(springs.get(i).getP2()).getPosition().getX(),
-                        (int) points.get(springs.get(i).getP2()).getPosition().getY());
-            }
-        }
-
-        if (SoftBodyModel.drawPoints) {
-            g.setColor(Color.red);
-
-            for (int i = 0; i < NUM_POINTS; i++) {
-
-                g.fillOval((int) (points.get(i).getPositionX() - ModelConfig.POINT_SIZE),
-                        (int) (points.get(i).getPositionY() - ModelConfig.POINT_SIZE), (int) (2 *
-                                ModelConfig.POINT_SIZE),
-                        (int) (2 * ModelConfig.POINT_SIZE));
-            }
-
-        }
-
-        // draw bounding box
-        if (SoftBodyModel.drawBoundingBox) {
-            g.setColor(Color.green);
-            g.drawRect(boundingBox.X(), boundingBox.Y(), boundingBox.width(), boundingBox.height());
-        }
-    }
-
     public void keyPressed(KeyEvent e) {
 
         if (e.getKeyCode() == KeyEvent.VK_UP)
@@ -794,7 +748,8 @@ public class SoftBody implements ReadOnlySoftBody {
      * 
      * @return array of x coordinates
      */
-    int[] getXArr() {
+    @Override
+    public int[] getXArr() {
         int[] xArr = new int[NUM_POINTS];
         for (int i = 0; i < NUM_POINTS; i++) {
             double x = points.get(i).getPositionX();
@@ -808,7 +763,8 @@ public class SoftBody implements ReadOnlySoftBody {
      * 
      * @return array of y coordinates
      */
-    int[] getYArr() {
+    @Override
+    public int[] getYArr() {
         int[] yArr = new int[NUM_POINTS];
         for (int i = 0; i < NUM_POINTS; i++) {
             double y = points.get(i).getPositionY();
