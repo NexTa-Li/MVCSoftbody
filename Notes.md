@@ -41,6 +41,30 @@
 
 - create Rectangle class with doubles instead of ints, I suspect that the bounding box is causing some missed collisions due to rounding errors, especially when there are many bodies packed together.
 
+### physical changes during simulation
+
+- ability to increase/ decrease final pressure.
+
+- ability to increase/ decrease the spring resting length.
+
+- ability to increase/ decrease spring constant.
+
+- ability to increase/ decrease mass
+
+- **Note**: these changes will need some serious limitations according to every other physical value the body has.  
+
+### Ability to add subtract points on a body
+
+### Ability to add/ remove bodies during the simulation
+
+- adding a new body is simple.
+
+- removing a body is slightly difficult since each body paints itself. see ***Draw bodies in view***
+
+### Draw bodies in view
+
+- use the readonly list of softbodies to get the positions of the bodies instead of asking each body to draw itself each tick. The current implementation was only temporary and needs to be changed asap. 
+
 # Bugs
 
 - Two bodies at the exact same height can cause a missed collision, I suspect this is because the collision detector doesn't check for intersections through points
