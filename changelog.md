@@ -102,7 +102,7 @@
 
 - `eqauls()` in `Point2D.java`: slightly modified the contract.
 
-# **[Version 1.1.1]** - 2023-09-06
+# **[Version 1.1.2]** - 2023-09-06
 
 ### Added
 
