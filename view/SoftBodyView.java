@@ -76,10 +76,12 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
         // graphics 2d
         Graphics2D g = (Graphics2D) graphics;
         g.setStroke(new BasicStroke(2));
+        List<ReadOnlyMassPoint> points;
+        ReadOnlySoftBody body;
 
         for (int i = 0; i < softBodies.size(); i++) {
-            List<ReadOnlyMassPoint> points = softBodies.get(i).getPoints();
-            ReadOnlySoftBody body = softBodies.get(i);
+            points = softBodies.get(i).getPoints();
+            body = softBodies.get(i);
 
             if (SoftBodyModel.fillSofbtody) {
                 g.setColor(Color.gray);
@@ -99,10 +101,10 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
             if (SoftBodyModel.drawPoints) {
                 g.setColor(Color.red);
 
-                for (int j = 0; i < points.size(); i++) {
+                for (int j = 0; j < points.size(); j++) {
 
-                    g.fillOval((int) (points.get(i).getPositionX() - ModelConfig.POINT_SIZE),
-                            (int) (points.get(i).getPositionY() - ModelConfig.POINT_SIZE), (int) (2 *
+                    g.fillOval((int) (points.get(j).getPositionX() - ModelConfig.POINT_SIZE),
+                            (int) (points.get(j).getPositionY() - ModelConfig.POINT_SIZE), (int) (2 *
                                     ModelConfig.POINT_SIZE),
                             (int) (2 * ModelConfig.POINT_SIZE));
                 }
