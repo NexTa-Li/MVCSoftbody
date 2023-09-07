@@ -162,4 +162,8 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
         // % (int) softBodies.get(SoftBodyPanel.selectedSoftbodyIndex).getNumPoints();
         // }
     }
+
+    public int getSelectedSoftbodyIndex() {
+        return selectedSoftbody;
+    }
 }

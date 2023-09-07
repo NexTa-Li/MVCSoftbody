@@ -226,7 +226,7 @@ public class SoftBody implements ReadOnlySoftBody {
                 SOFTBODY_MASS += SOFTBODY_MASS / 100.0;
             }
             if (decrease) {
-                SOFTBODY_MASS -= SOFTBODY_MASS / 100.0;
+                SOFTBODY_MASS = SOFTBODY_MASS <= 0.5 ? 0.5 : SOFTBODY_MASS - SOFTBODY_MASS / 100.0;
             }
         }
 
@@ -843,4 +843,30 @@ public class SoftBody implements ReadOnlySoftBody {
         }
         return yArr;
     }
+
+    @Override
+    public double getPressure() {
+        return this.pressure;
+    }
+
+    @Override
+    public double getSpringConstant() {
+        return this.SPRING_CONSTANT;
+    }
+
+    @Override
+    public double getSpringDamping() {
+        return this.SPRING_DAMPING;
+    }
+
+    @Override
+    public double getSpringRestLength() {
+        return this.springs.get(0).getLength();
+    }
+
+    @Override
+    public double getMass() {
+        return this.SOFTBODY_MASS;
+    }
+
 }

@@ -4,8 +4,8 @@ public interface ModelConfig {
     // Physical constants
     static final int FILL_DURATION = 100; // the higher, the better (helps with volume calculations)
     static final double USER_FORCE = 250;
-    static final double BOUNCINESS = 0.97; // 0.95 is a good value
-    static final double SURFACE_FRICTION_COEFFICIENT = 0.02; // 0.01 is a good value
+    public static final double BOUNCINESS = 0.97; // 0.95 is a good value
+    public static final double SURFACE_FRICTION_COEFFICIENT = 0.02; // 0.01 is a good value
     static final int NUM_SOFTBODIES = 5;
 
     static final int NUM_POINTS = 32;
@@ -44,8 +44,8 @@ public interface ModelConfig {
 
     static final int WALL_THICKNESS = 3;
 
-    static final int TICKRATE = 256;
-    static final double timestep = 0.005; // 0.005 is a decent value
+    static final int TICKRATE = 512;
+    static final double timestep = 0.002; // 0.005 is a decent value
 
     /**
      * The radius of each mass point in the soft body.

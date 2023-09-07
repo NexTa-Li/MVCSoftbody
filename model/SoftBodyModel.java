@@ -176,39 +176,8 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
     }
 
     @Override
-    public double getPressure() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPressure'");
-    }
-
-    @Override
-    public double getNumPoints() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getNumPoints'");
-    }
-
-    @Override
-    public double getSpringConstant() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getSpringConstant'");
-    }
-
-    @Override
-    public double getSpringDamping() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getSpringDamping'");
-    }
-
-    @Override
-    public double getMass() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMass'");
-    }
-
-    @Override
-    public double getRadius() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getRadius'");
+    public Vector2D getGravity() {
+        return new Vector2D(SoftBodyModel.gravity);
     }
 
 }

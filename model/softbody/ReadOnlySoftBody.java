@@ -13,6 +13,16 @@ public interface ReadOnlySoftBody {
 
     public Rectangle getBoundingBox();
 
+    public double getPressure();
+
+    public double getSpringConstant();
+
+    public double getSpringDamping();
+
+    public double getSpringRestLength();
+
+    public double getMass();
+
     public int[] getXArr();
 
     public int[] getYArr();

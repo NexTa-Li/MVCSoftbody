@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 
+import model.geometry.Vector2D;
 import model.softbody.ReadOnlySoftBody;
 
 public interface ReadOnlyModel {
@@ -9,15 +10,5 @@ public interface ReadOnlyModel {
 
     public int getId();
 
-    public double getPressure();
-
-    public double getNumPoints();
-
-    public double getSpringConstant();
-
-    public double getSpringDamping();
-
-    public double getMass();
-
-    public double getRadius();
+    public Vector2D getGravity();
 }

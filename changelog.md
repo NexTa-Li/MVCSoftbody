@@ -125,3 +125,17 @@
 - `massChange`, `pressureChange`, `springLengthChange` & `springConstantChange` in `SoftBody.java`: toggle each option by pressing `7, 8, 9, 0` respectively. then press `+` or `-` to increase or decrease the value.
 
 - `addLength()` in `Spring.java`
+
+# **[Version 1.1.4]** - 2023-09-07
+
+### Added
+
+- `getter methods` in `ReadOnlySoftBody.java`: new methods to replace the ones placed in `ReadOnlyModel.java`
+
+- `debugging stats panel` in `View.java`: added a panel that displays debugging information about the softbodies.
+
+- `hard limit` for mass changes in `SoftBody.java`: added a hard limit for mass changes so that the mass of a softbody can't be less than 0.5.
+
+### Removed
+
+- `getter methods` in `ReadOnlyModel.java`: removed the methods that were moved to `ReadOnlySoftBody.java`
