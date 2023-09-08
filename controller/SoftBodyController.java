@@ -36,8 +36,6 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
     static boolean mouseReleased = false;
     static boolean mouseInPanel = false;
 
-    static int selectedSoftbody = 0; // index of the selected softbody
-
     public SoftBodyController(SoftBodyModel model) {
         this.model = model;
     }
@@ -75,7 +73,7 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
                     System.out.println("Soft body " + i + " was clicked on");
                     // update display info
 
-                    selectedSoftbody = i;
+                    model.selectedSoftbodyIndex = i;
                     break;
                 }
             }
@@ -105,7 +103,7 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
         // softBody.keyPressed(e);
         // }
 
-        model.getSoftBodies().get(selectedSoftbody).keyPressed(e);
+        model.getSoftBodies().get(model.getId()).keyPressed(e);
 
         if (e.getKeyCode() == KeyEvent.VK_UP)
             keyUp = true;
@@ -131,7 +129,7 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
         // for (SoftBody softBody : softBodies) {
         // softBody.keyReleased(e);
         // }
-        model.getSoftBodies().get(selectedSoftbody).keyReleased(e);
+        model.getSoftBodies().get(model.getId()).keyReleased(e);
 
         if (e.getKeyCode() == KeyEvent.VK_UP)
             keyUp = false;
@@ -161,9 +159,5 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
         // + (int) softBodies.get(SoftBodyPanel.selectedSoftbodyIndex).getNumPoints())
         // % (int) softBodies.get(SoftBodyPanel.selectedSoftbodyIndex).getNumPoints();
         // }
-    }
-
-    public int getSelectedSoftbodyIndex() {
-        return selectedSoftbody;
     }
 }

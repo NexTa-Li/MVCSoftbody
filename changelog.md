@@ -142,13 +142,13 @@
 
 # **[Version 1.1.5]** - 2023-09-08
 
-### Added
-
 ### Changed
 
 - `massChange`, `pressureChange`, `springLengthChange` & `springConstantChange` in `SoftBody.java`: Changed the order of their indicator keys. documented in `README.md`.
 
 - `applyFriction()` in `SoftBody.java`: friction used to be applied to velocity and force, after some testing, force changes did nothing. Not sure why but I'd guess its because force was reset every tick. Now friction is only applied to velocity.
+
+- `getId()` in `SoftBodyModel.java`: changed the method to return the id of the softbody, instead of the controller returning it to view. This is because the model should be sending the data to the view, not the controller.
 
 ### Tested
 

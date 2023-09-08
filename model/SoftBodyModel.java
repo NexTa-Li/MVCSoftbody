@@ -25,6 +25,8 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
     public static boolean drawSprings = false;
     public static boolean drawBoundingBox = false;
 
+    public int selectedSoftbodyIndex = 0;
+
     public SoftBodyModel() {
 
         createSoftBodies();
@@ -87,8 +89,13 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
     public void idle() {
         for (int i = 0; i < softBodies.size(); i++) {
-
-            softBodies.get(i).idle();
+            for (int j = 0; j < softBodies.size(); j++) {
+                if (i == j)
+                    continue;
+                if (SoftBodyUtil.isMerged(softBodies.get(i), softBodies.get(j))) {
+                    System.out.println("Softbody " + i + " and " + j + " are merged");
+                }
+            }
         }
     }
 
@@ -154,8 +161,7 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
     @Override
     public int getId() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getId'");
+        return this.selectedSoftbodyIndex;
     }
 
     @Override

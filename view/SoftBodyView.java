@@ -160,9 +160,9 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
         g.setColor(Color.black);
 
         g.drawString("Selected Body: ", 10, PANEL_HEIGHT / 2 + 20);
-        g.drawString("" + controller.getSelectedSoftbodyIndex(), 120, PANEL_HEIGHT / 2 + 20);
+        g.drawString("" + model.getId(), 120, PANEL_HEIGHT / 2 + 20);
 
-        ReadOnlySoftBody body = softBodies.get(controller.getSelectedSoftbodyIndex());
+        ReadOnlySoftBody body = softBodies.get(model.getId());
 
         g.drawString("Pressure: ", 10, PANEL_HEIGHT / 2 + 40);
         g.drawString(String.format("%,.2f", body.getPressure()) + "", 120, PANEL_HEIGHT / 2 + 40);
