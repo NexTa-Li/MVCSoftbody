@@ -8,6 +8,7 @@ import java.util.HashSet;
 
 import model.geometry.Point2D;
 import model.geometry.Vector2D;
+import model.masspoint.MassPoint;
 import model.softbody.ReadOnlySoftBody;
 import model.softbody.SoftBody;
 import model.softbody.SoftBodyUtil;
@@ -89,13 +90,7 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
     public void idle() {
         for (int i = 0; i < softBodies.size(); i++) {
-            for (int j = 0; j < softBodies.size(); j++) {
-                if (i == j)
-                    continue;
-                if (SoftBodyUtil.isMerged(softBodies.get(i), softBodies.get(j))) {
-                    System.out.println("Softbody " + i + " and " + j + " are merged");
-                }
-            }
+            softBodies.get(i).idle();
         }
     }
 
