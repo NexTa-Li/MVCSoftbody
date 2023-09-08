@@ -50,7 +50,7 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
                 // set random color
                 X += 300;
-                Y += 13;
+                // Y += 13;
                 softBodies.add(softBody);
             }
             return;
@@ -90,23 +90,6 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
             softBodies.get(i).idle();
         }
-
-        // for (int i = 0; i < softBodies.size(); i++) {
-
-        // for (int j = 0; j < softBodies.size(); j++) {
-        // if (SoftBodyUtil.isMerged(softBodies.get(i), softBodies.get(j)) && i != j) {
-        // // System.out.println("damn");
-        // }
-
-        // }
-
-        // }
-
-        // if (count % 800 == 0) {
-        // gravity.multiplyY(-1);
-        // count = 0;
-        // }
-        // count++;
     }
 
     @Override

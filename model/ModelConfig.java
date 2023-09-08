@@ -5,8 +5,9 @@ public interface ModelConfig {
     static final int FILL_DURATION = 100; // the higher, the better (helps with volume calculations)
     static final double USER_FORCE = 250;
     public static final double BOUNCINESS = 0.97; // 0.95 is a good value
-    public static final double SURFACE_FRICTION_COEFFICIENT = 0.02; // 0.01 is a good value
-    static final int NUM_SOFTBODIES = 5;
+    public static final double SURFACE_FRICTION_COEFFICIENT = 0.3; // 0.01 is a good value
+    public static final double AIR_FRICTION_COEFFICIENT = 0.0001; // 0.0001 is a good value
+    static final int NUM_SOFTBODIES = 1;
 
     static final int NUM_POINTS = 32;
 
@@ -19,7 +20,7 @@ public interface ModelConfig {
      * This means that the resting length of each spring is also
      * determined by this value.
      */
-    static final double RADIUS = 5.0;
+    static final double RADIUS = 45.0;
 
     /**
      * The Mass of each mass point in the softbody. This determines how much the
@@ -65,5 +66,5 @@ public interface ModelConfig {
      * bodies will spawn in a straight line from left to right. This is useful for
      * debugging collisions.
      */
-    static final boolean RANDOM_POSITIONS = true;
+    static final boolean RANDOM_POSITIONS = false;
 }

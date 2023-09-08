@@ -139,3 +139,17 @@
 ### Removed
 
 - `getter methods` in `ReadOnlyModel.java`: removed the methods that were moved to `ReadOnlySoftBody.java`
+
+# **[Version 1.1.5]** - 2023-09-08
+
+### Added
+
+### Changed
+
+- `massChange`, `pressureChange`, `springLengthChange` & `springConstantChange` in `SoftBody.java`: Changed the order of their indicator keys. documented in `README.md`.
+
+- `applyFriction()` in `SoftBody.java`: friction used to be applied to velocity and force, after some testing, force changes did nothing. Not sure why but I'd guess its because force was reset every tick. Now friction is only applied to velocity.
+
+### Tested
+
+- `accumulateCollisionForce()` in `SoftBody.java`: Tested the possibility of handling softbody collisions by accumulating forces instead of changing the positions of the points and setting velocity to 0 when they collide with a surface. I hypothesized that this will be more accurate, since force is being reflected but there was some issues with it so the idea was scrapped.

@@ -372,7 +372,6 @@ public class SoftBody implements ReadOnlySoftBody {
 
             points.get(p1).addForce(p1fx, p1fy);
             points.get(p2).addForce(p2fx, p2fy);
-
         }
     }
 
@@ -425,6 +424,7 @@ public class SoftBody implements ReadOnlySoftBody {
         accumulateForces();
 
         for (int i = 0; i < NUM_POINTS; i++) {
+
             double dvx = (points.get(i).getForceX() + ForceSaved.get(i).getX()) / SOFTBODY_MASS * ModelConfig.timestep;
             double dvy = (points.get(i).getForceY() + ForceSaved.get(i).getY()) / SOFTBODY_MASS * ModelConfig.timestep;
 
@@ -453,11 +453,10 @@ public class SoftBody implements ReadOnlySoftBody {
      */
     void applyFriction(int i) {
         if (points.get(i).isCollided()) {
-            // scale the velocity down (1.0 represents no friction i.e full velocity
-            // retention)
+            // scale the velocity down (1.0 represents no friction i.e full velo retention)
             points.get(i).getVelocity().multiply(1.0 - ModelConfig.SURFACE_FRICTION_COEFFICIENT);
-            points.get(i).getForce().multiply(1.0 - ModelConfig.SURFACE_FRICTION_COEFFICIENT);
             points.get(i).setCollided(false);
+            return;
         }
     }
 
@@ -716,7 +715,6 @@ public class SoftBody implements ReadOnlySoftBody {
             if (tempDistance <= oldDistance) {
                 edgePointIndices[0] = i;
                 edgePointIndices[1] = tempClosestPoint.equals(edgeStart) ? -1 : (i + 1) % points;
-
                 // this should probably only be set if theres actually a collision
                 closestPoint.setLocation(tempClosestPoint.getX(), tempClosestPoint.getY());
             }
@@ -769,24 +767,24 @@ public class SoftBody implements ReadOnlySoftBody {
         if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_UNDERSCORE)
             decrease = true;
         if (e.getKeyCode() == KeyEvent.VK_7) {
-            System.out.println("Mass Change");
-            resetChangeVars();
-            massChange = true;
-        }
-        if (e.getKeyCode() == KeyEvent.VK_8) {
             System.out.println("Pressure Change");
             resetChangeVars();
             pressureChange = true;
         }
-        if (e.getKeyCode() == KeyEvent.VK_9) {
-            System.out.println("Spring Length Change");
+        if (e.getKeyCode() == KeyEvent.VK_8) {
+            System.out.println("Mass Change");
             resetChangeVars();
-            springLengthChange = true;
+            massChange = true;
         }
-        if (e.getKeyCode() == KeyEvent.VK_0) {
+        if (e.getKeyCode() == KeyEvent.VK_9) {
             System.out.println("Spring Constant Change");
             resetChangeVars();
             springConstantChange = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_0) {
+            System.out.println("Spring Length Change");
+            resetChangeVars();
+            springLengthChange = true;
         }
 
     }

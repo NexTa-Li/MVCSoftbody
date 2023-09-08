@@ -51,21 +51,7 @@
 
 - Seems like during vertex collisions, they end up getting stuck together permanently in some rare instances (this may be fixed?)
 
-- Right leaning bias (Serious bug, needs to be fixed)
-
 - Spawning on top of each other causes a permanent stick
-
-### Unknown bias towards positive infinity
-
-- For the longest time there has always been a bias towards the right side of the container during sustained collisions. so if theres enough bodies to fill up the entire ground, they will force each other towards the right. I am not sure why. (easy hack is to just set some gravity towards the left)
-- After doing some testing the only thing I can see this being caused by is somewhere in handleSoftBodyCollisions()
-- accumulating softbody collision forces makes this less apparent with larger numbers for some reason, now they flow back and forth
-
-#### **What is NOT causing this bug:**
-
-- [x] applyFriction
-- [x] handlePointCollision
-- [ ] handleRigidCollisions ~ hard to say for sure but I doubt it
 
 ### Bounciness modifier is just a hack.
 
@@ -95,6 +81,18 @@
 - ability to increase/ decrease mass
 
 - **Note**: these changes will need some serious limitations according to every other physical value the body has.
+
+# Fixed Bugs
+
+### Unknown bias towards positive infinity
+
+- For the longest time there has always been a bias towards the right side of the container during sustained collisions. so if theres enough bodies to fill up the entire ground, they will force each other towards the right. I am not sure why. (easy hack is to just set some gravity towards the left)
+
+- After doing some testing the only thing I can see this being caused by is somewhere in handleSoftBodyCollisions()
+
+- accumulating softbody collision forces makes this less apparent with larger numbers for some reason, now they flow back and forth
+
+- Right leaning bias (Serious bug, needs to be fixed) ~ fixed with bounding box patch
 
 # Data Visualization Fork
 
