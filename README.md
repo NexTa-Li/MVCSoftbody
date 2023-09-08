@@ -16,3 +16,12 @@ The softbodies consist of springs and mass points. Each spring has two mass poin
 
 - `Left Click`: Select a softbody to control
 - `WASD`: Move the selected softbody
+
+  #### Physical Property Change
+- `7`: Indicate Pressure Change
+- `8`: Indicate Mass Change
+- `9`: Indicate Spring Constant Change
+- `0`: Indicate Spring Resting Length Change
+- `-`: Decrement selected property
+- `+`: Increment selected property
+  
