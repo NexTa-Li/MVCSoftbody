@@ -6,6 +6,11 @@ A project to simulate 2D pressurized soft body physics in Java (using MVC archit
 
 The softbodies consist of springs and mass points. Each spring has two mass points on each end (a spring is a Line).
 
+## Configure
+
+- All physical properties can be configured in `ModelConfig.java` (except gravity, which can be edited in `SoftBodyModel.java`). 
+- Graphical settings are located in `SoftBodyModel.java` (booleans for drawing points, springs, filling the body etc), and `ViewConfig.java`. 
+
 ## How to run
 
 1. Run the Driver.java file.
