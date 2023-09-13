@@ -114,12 +114,12 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
             points = softBodies.get(i).getPoints();
             body = softBodies.get(i);
 
-            if (SoftBodyModel.fillSofbtody) {
+            if (model.isBodyFilled()) {
                 g.setColor(Color.gray);
                 g.fillPolygon(body.getXArr(), body.getYArr(), points.size());
             }
 
-            if (SoftBodyModel.drawSprings) {
+            if (model.isSpringsDrawn()) {
                 g.setColor(Color.WHITE);
                 for (int j = 0; j < points.size(); j++) {
                     g.drawLine((int) points.get(j).getPosition().getX(),
@@ -129,7 +129,7 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
                 }
             }
 
-            if (SoftBodyModel.drawPoints) {
+            if (model.isPointsDrawn()) {
                 g.setColor(Color.red);
 
                 for (int j = 0; j < points.size(); j++) {
@@ -143,14 +143,17 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
             }
 
             // draw bounding box
-            if (SoftBodyModel.drawBoundingBox) {
+            if (model.isBoundsDrawn()) {
                 g.setColor(Color.green);
-                g.drawRect(body.getBoundingBox().X(), body.getBoundingBox().Y(), body.getBoundingBox().width(),
-                        body.getBoundingBox().height());
+                g.drawRect(body.getBoundingBox().xToInt(), body.getBoundingBox().yToInt(),
+                        body.getBoundingBox().widthToInt(), body.getBoundingBox().heightToInt());
             }
         }
 
-        renderSoftBodyInfo(g);
+        if (model.isBodyInfoDrawn()) {
+            renderSoftBodyInfo(g);
+        }
+
     }
 
     public void renderSoftBodyInfo(Graphics2D g) {

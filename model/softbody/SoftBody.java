@@ -34,8 +34,9 @@ public class SoftBody implements ReadOnlySoftBody {
 
     double xMin, xMax, yMin, yMax;
 
-    boolean keyUp, keyDown, keyLeft, keyRight, increase, decrease;
-    boolean pressureChange, springLengthChange, springConstantChange, massChange;
+    public boolean keyUp, keyDown, keyLeft, keyRight;
+    public boolean increase, decrease;
+    public boolean pressureChange, springLengthChange, springConstantChange, massChange;
 
     /*
      * Maintaining invariants
@@ -752,60 +753,7 @@ public class SoftBody implements ReadOnlySoftBody {
         return this.boundingBox; // Privacy sacrifice for performance
     }
 
-    public void keyPressed(KeyEvent e) {
-
-        if (e.getKeyCode() == KeyEvent.VK_UP)
-            keyUp = true;
-        if (e.getKeyCode() == KeyEvent.VK_DOWN)
-            keyDown = true;
-        if (e.getKeyCode() == KeyEvent.VK_LEFT)
-            keyLeft = true;
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-            keyRight = true;
-        if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_EQUALS)
-            increase = true;
-        if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_UNDERSCORE)
-            decrease = true;
-        if (e.getKeyCode() == KeyEvent.VK_7) {
-            System.out.println("Pressure Change");
-            resetChangeVars();
-            pressureChange = true;
-        }
-        if (e.getKeyCode() == KeyEvent.VK_8) {
-            System.out.println("Mass Change");
-            resetChangeVars();
-            massChange = true;
-        }
-        if (e.getKeyCode() == KeyEvent.VK_9) {
-            System.out.println("Spring Constant Change");
-            resetChangeVars();
-            springConstantChange = true;
-        }
-        if (e.getKeyCode() == KeyEvent.VK_0) {
-            System.out.println("Spring Length Change");
-            resetChangeVars();
-            springLengthChange = true;
-        }
-
-    }
-
-    public void keyReleased(KeyEvent e) {
-
-        if (e.getKeyCode() == KeyEvent.VK_UP)
-            keyUp = false;
-        if (e.getKeyCode() == KeyEvent.VK_DOWN)
-            keyDown = false;
-        if (e.getKeyCode() == KeyEvent.VK_LEFT)
-            keyLeft = false;
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-            keyRight = false;
-        if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_EQUALS)
-            increase = false;
-        if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_UNDERSCORE)
-            decrease = false;
-    }
-
-    void resetChangeVars() {
+    public void resetChangeVars() {
         massChange = false;
         pressureChange = false;
         springLengthChange = false;

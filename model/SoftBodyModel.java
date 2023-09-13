@@ -2,13 +2,9 @@ package model;
 
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.ArrayList;
-import java.util.HashSet;
 
-import model.geometry.Point2D;
 import model.geometry.Vector2D;
-import model.masspoint.MassPoint;
 import model.softbody.ReadOnlySoftBody;
 import model.softbody.SoftBody;
 import model.softbody.SoftBodyUtil;
@@ -16,15 +12,16 @@ import view.ViewConfig;
 
 public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
-    public static Vector2D gravity = new Vector2D(0, 105);
+    public static Vector2D gravity = new Vector2D(0, 0);
     List<SoftBody> softBodies;
     Thread thread;
 
     // graphical settings that can be changed by the controller
-    public static boolean fillSofbtody = true;
-    public static boolean drawPoints = false;
-    public static boolean drawSprings = false;
-    public static boolean drawBoundingBox = false;
+    public boolean bodyFilled = true;
+    public boolean pointsDrawn = false;
+    public boolean springsDrawn = false;
+    public boolean boundsDrawn = false;
+    public boolean drawBodyInfo = false;
 
     public int selectedSoftbodyIndex = 0;
 
@@ -162,6 +159,31 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
     @Override
     public Vector2D getGravity() {
         return new Vector2D(SoftBodyModel.gravity);
+    }
+
+    @Override
+    public boolean isBodyFilled() {
+        return this.bodyFilled;
+    }
+
+    @Override
+    public boolean isPointsDrawn() {
+        return this.pointsDrawn;
+    }
+
+    @Override
+    public boolean isSpringsDrawn() {
+        return this.springsDrawn;
+    }
+
+    @Override
+    public boolean isBoundsDrawn() {
+        return this.boundsDrawn;
+    }
+
+    @Override
+    public boolean isBodyInfoDrawn() {
+        return this.drawBodyInfo;
     }
 
 }

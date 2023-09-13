@@ -46,19 +46,19 @@ public class Rectangle {
     }
 
     // methods to return ints for drawing purposes
-    public int X() {
+    public int xToInt() {
         return (int) x;
     }
 
-    public int Y() {
+    public int yToInt() {
         return (int) y;
     }
 
-    public int width() {
+    public int widthToInt() {
         return (int) width;
     }
 
-    public int height() {
+    public int heightToInt() {
         return (int) height;
     }
 }

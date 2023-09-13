@@ -25,13 +25,6 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
     static int mouseX, mouseY;
 
     // input flags
-    static boolean keyUp = false;
-    static boolean keyDown = false;
-    static boolean keyLeft = false;
-    static boolean keyRight = false;
-    static boolean keyA = false;
-    static boolean keyD = false;
-
     static boolean mousePressed = false;
     static boolean mouseReleased = false;
     static boolean mouseInPanel = false;
@@ -99,24 +92,41 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
     @Override
     public void keyPressed(KeyEvent e) {
 
-        // for (SoftBody softBody : softBodies) {
-        // softBody.keyPressed(e);
-        // }
-
-        model.getSoftBodies().get(model.getId()).keyPressed(e);
+        if (e.getKeyCode() == ToggleSoftBodyInfo)
+            model.drawBodyInfo = !model.drawBodyInfo;
 
         if (e.getKeyCode() == KeyEvent.VK_UP)
-            keyUp = true;
+            model.getSoftBodies().get(model.getId()).keyUp = true;
         if (e.getKeyCode() == KeyEvent.VK_DOWN)
-            keyDown = true;
+            model.getSoftBodies().get(model.getId()).keyDown = true;
         if (e.getKeyCode() == KeyEvent.VK_LEFT)
-            keyLeft = true;
+            model.getSoftBodies().get(model.getId()).keyLeft = true;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-            keyRight = true;
-        if (e.getKeyCode() == KeyEvent.VK_A)
-            keyA = true;
-        if (e.getKeyCode() == KeyEvent.VK_D)
-            keyD = true;
+            model.getSoftBodies().get(model.getId()).keyRight = true;
+        if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_EQUALS)
+            model.getSoftBodies().get(model.getId()).increase = true;
+        if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_UNDERSCORE)
+            model.getSoftBodies().get(model.getId()).decrease = true;
+        if (e.getKeyCode() == KeyEvent.VK_7) {
+            System.out.println("Pressure Change");
+            model.getSoftBodies().get(model.getId()).resetChangeVars();
+            model.getSoftBodies().get(model.getId()).pressureChange = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_8) {
+            System.out.println("Mass Change");
+            model.getSoftBodies().get(model.getId()).resetChangeVars();
+            model.getSoftBodies().get(model.getId()).massChange = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_9) {
+            System.out.println("Spring Constant Change");
+            model.getSoftBodies().get(model.getId()).resetChangeVars();
+            model.getSoftBodies().get(model.getId()).springConstantChange = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_0) {
+            System.out.println("Spring Length Change");
+            model.getSoftBodies().get(model.getId()).resetChangeVars();
+            model.getSoftBodies().get(model.getId()).springLengthChange = true;
+        }
 
         // used to test frame by frame
         if (e.getKeyCode() == KeyEvent.VK_SPACE)
@@ -126,24 +136,18 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
     @Override
     public void keyReleased(KeyEvent e) {
 
-        // for (SoftBody softBody : softBodies) {
-        // softBody.keyReleased(e);
-        // }
-        model.getSoftBodies().get(model.getId()).keyReleased(e);
-
         if (e.getKeyCode() == KeyEvent.VK_UP)
-            keyUp = false;
+            model.getSoftBodies().get(model.getId()).keyUp = false;
         if (e.getKeyCode() == KeyEvent.VK_DOWN)
-            keyDown = false;
+            model.getSoftBodies().get(model.getId()).keyDown = false;
         if (e.getKeyCode() == KeyEvent.VK_LEFT)
-            keyLeft = false;
+            model.getSoftBodies().get(model.getId()).keyLeft = false;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-            keyRight = false;
-        if (e.getKeyCode() == KeyEvent.VK_A)
-            keyA = false;
-        if (e.getKeyCode() == KeyEvent.VK_D)
-            keyD = false;
-
+            model.getSoftBodies().get(model.getId()).keyRight = false;
+        if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_EQUALS)
+            model.getSoftBodies().get(model.getId()).increase = false;
+        if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_UNDERSCORE)
+            model.getSoftBodies().get(model.getId()).decrease = false;
     }
 
     @Override

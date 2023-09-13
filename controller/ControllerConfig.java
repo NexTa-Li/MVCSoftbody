@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 
 public interface ControllerConfig {
     static final int ToggleStats = KeyEvent.VK_1;
-    static final int ToggleSoftBodyDetails = KeyEvent.VK_2;
+    static final int ToggleSoftBodyInfo = KeyEvent.VK_2;
     static final int ToggleFPS = KeyEvent.VK_3;
     static final int TogglePoints = KeyEvent.VK_P;
     static final int ToggleFillBodies = KeyEvent.VK_F;

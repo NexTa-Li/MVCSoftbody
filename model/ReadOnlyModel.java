@@ -11,4 +11,14 @@ public interface ReadOnlyModel {
     public int getId();
 
     public Vector2D getGravity();
+
+    public boolean isBodyFilled();
+
+    public boolean isPointsDrawn();
+
+    public boolean isSpringsDrawn();
+
+    public boolean isBoundsDrawn();
+
+    public boolean isBodyInfoDrawn();
 }

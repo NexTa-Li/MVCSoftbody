@@ -153,3 +153,27 @@
 ### Tested
 
 - `accumulateCollisionForce()` in `SoftBody.java`: Tested the possibility of handling softbody collisions by accumulating forces instead of changing the positions of the points and setting velocity to 0 when they collide with a surface. I hypothesized that this will be more accurate, since force is being reflected but there was some issues with it so the idea was scrapped.
+
+# **[Version 1.1.6]** - 2023-09-13 - Improved MVC Implementation
+
+### Added
+
+`various graphical methods` in `ReadOnlyModel.java`: added methods that return graphical booleans,this way view can use getters instead of accessing the graphical booleans statically.
+
+`Draw Softbody Info Toggle`: added a toggle that controls whether or not the softbody info is drawn, via the `2` key.
+
+### Changed
+
+`Method names` in `Rectangle.java`: Changed the names to more accurately represent what they do.
+
+`keyPressed()` and `keyReleased()` in `SoftBodyController.java`: Changed the methods to more accurately represent MVC relationships.
+
+### Moved
+
+`Event Methods` in `SoftBody.java` to `SoftBodyController.java`: Moved the event methods to `SoftBodyController.java` since the controller is the one that should be handling the events. This is a step towards a more accurate MVC implementation.
+
+### Removed
+
+`input flags` in `SoftBodyController.java`: Removed the input flags since they are already being set when a key is pressed directly to the model by the controller.
+
+`keyPressed()` and `keyReleased()` in `SoftBody.java`: Removed the methods since they are now exclusively handled in `SoftBodyController.java`
