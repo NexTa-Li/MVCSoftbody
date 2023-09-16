@@ -40,7 +40,7 @@ public class MassPoint implements ReadOnlyMassPoint {
     }
 
     public Point2D getPosition() {
-        return position;
+        return position; // not safe, sacrifice for performance
     }
 
     public Double getPositionX() {

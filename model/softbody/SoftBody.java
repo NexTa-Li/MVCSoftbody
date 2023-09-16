@@ -1,6 +1,5 @@
 package model.softbody;
 
-import java.awt.event.KeyEvent;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +8,7 @@ import model.ModelConfig;
 import model.SoftBodyModel;
 import model.Spring;
 import model.geometry.Point2D;
+import model.geometry.Polygon2D;
 import model.geometry.Vector2D;
 import model.geometry.Rectangle;
 import model.masspoint.MassPoint;
@@ -19,12 +19,14 @@ public class SoftBody implements ReadOnlySoftBody {
     List<MassPoint> points;
     List<Spring> springs;
     List<SoftBody> softBodies;
+    List<Polygon2D> polygons;
 
     final int NUM_POINTS;
     final double SPRING_DAMPING;
-    double SOFTBODY_MASS;
-    double SPRING_CONSTANT;
-    double FINAL_PRESSURE;
+
+    double mass;
+    double springConstant;
+    double targetPressure;
     double pressure = 0.0;
 
     int[] edgePointIndices;
@@ -80,16 +82,17 @@ public class SoftBody implements ReadOnlySoftBody {
      * @param softBodies reference to a list of all other softbodies
      */
     public SoftBody(double x, double y, int numPoints, double radius, double mass, double ks, double kd,
-            double pressure, List<SoftBody> softBodies) {
+            double pressure, List<SoftBody> softBodies, List<Polygon2D> polygons) {
         this.NUM_POINTS = numPoints;
-        this.SOFTBODY_MASS = mass;
-        this.SPRING_CONSTANT = ks;
+        this.mass = mass;
+        this.springConstant = ks;
         this.SPRING_DAMPING = kd;
-        this.FINAL_PRESSURE = pressure;
+        this.targetPressure = pressure;
 
         points = new ArrayList<MassPoint>();
         springs = new ArrayList<Spring>();
         this.softBodies = softBodies; // pass a reference to the list of softbodies
+        this.polygons = polygons;
 
         edgePointIndices = new int[3]; // find a better soln
 
@@ -192,8 +195,8 @@ public class SoftBody implements ReadOnlySoftBody {
         integrateHuen();
 
         // fill in pressure
-        if (pressure < FINAL_PRESSURE) {
-            pressure += (FINAL_PRESSURE / ModelConfig.FILL_DURATION);
+        if (pressure < targetPressure) {
+            pressure += (targetPressure / ModelConfig.FILL_DURATION);
         }
     }
 
@@ -215,7 +218,7 @@ public class SoftBody implements ReadOnlySoftBody {
     void accumulateGravityForce() {
 
         // Pressurization period
-        if (pressure < FINAL_PRESSURE) {
+        if (pressure < targetPressure) {
             for (MassPoint p : points) {
                 p.getForce().set(0.0, 0.0);
             }
@@ -224,28 +227,28 @@ public class SoftBody implements ReadOnlySoftBody {
 
         if (massChange) {
             if (increase) {
-                SOFTBODY_MASS += SOFTBODY_MASS / 100.0;
+                mass = mass >= 3.5 ? 3.5 : mass + mass / 100.0;
             }
             if (decrease) {
-                SOFTBODY_MASS = SOFTBODY_MASS <= 0.5 ? 0.5 : SOFTBODY_MASS - SOFTBODY_MASS / 100.0;
+                mass = mass <= 0.5 ? 0.5 : mass - mass / 100.0;
             }
         }
 
         for (MassPoint massPoint : points) {
             massPoint.setForce(SoftBodyModel.gravity.getX(), SoftBodyModel.gravity.getY());
-            massPoint.getForce().multiply(SOFTBODY_MASS); // F = m * a
+            massPoint.getForce().multiply(mass); // F = m * a
 
             if (keyUp) {
-                massPoint.addForceY(-ModelConfig.USER_FORCE * SOFTBODY_MASS);
+                massPoint.addForceY(-ModelConfig.USER_FORCE * mass);
             }
             if (keyDown) {
-                massPoint.addForceY(ModelConfig.USER_FORCE * SOFTBODY_MASS);
+                massPoint.addForceY(ModelConfig.USER_FORCE * mass);
             }
             if (keyLeft) {
-                massPoint.addForceX(-ModelConfig.USER_FORCE * SOFTBODY_MASS);
+                massPoint.addForceX(-ModelConfig.USER_FORCE * mass);
             }
             if (keyRight) {
-                massPoint.addForceX(ModelConfig.USER_FORCE * SOFTBODY_MASS);
+                massPoint.addForceX(ModelConfig.USER_FORCE * mass);
             }
         }
     }
@@ -267,10 +270,10 @@ public class SoftBody implements ReadOnlySoftBody {
 
         if (springConstantChange) {
             if (increase) {
-                SPRING_CONSTANT += SPRING_CONSTANT / 100.0;
+                springConstant += springConstant / 100.0;
             }
             if (decrease) {
-                SPRING_CONSTANT -= SPRING_CONSTANT / 100.0;
+                springConstant -= springConstant / 100.0;
             }
         }
 
@@ -291,7 +294,7 @@ public class SoftBody implements ReadOnlySoftBody {
                 velocityX = points.get(p1).getVelocityX() - points.get(p2).getVelocityX();
                 velocityY = points.get(p1).getVelocityY() - points.get(p2).getVelocityY();
 
-                force = (distance - springs.get(i).getLength()) * SPRING_CONSTANT +
+                force = (distance - springs.get(i).getLength()) * springConstant +
                         (velocityX * (x1 - x2) + velocityY * (y1 - y2)) * SPRING_DAMPING / distance;
 
                 // calculate force vector
@@ -324,14 +327,14 @@ public class SoftBody implements ReadOnlySoftBody {
 
         if (pressureChange) {
             if (increase) {
-                FINAL_PRESSURE += FINAL_PRESSURE / 100.0;
+                targetPressure += targetPressure / 100.0;
             }
             if (decrease) {
-                FINAL_PRESSURE -= FINAL_PRESSURE / 100.0;
+                targetPressure -= targetPressure / 100.0;
             }
         }
 
-        pressure = FINAL_PRESSURE;
+        pressure = targetPressure;
 
         for (int i = 0; i < springs.size(); i++) {
             p1 = springs.get(i).getP1();
@@ -401,8 +404,8 @@ public class SoftBody implements ReadOnlySoftBody {
             ForceSaved.add(new Vector2D(points.get(i).getForce()));
             VelocitySaved.add(new Vector2D(points.get(i).getVelocity()));
 
-            double dvx = points.get(i).getForceX() / SOFTBODY_MASS * ModelConfig.timestep;
-            double dvy = points.get(i).getForceY() / SOFTBODY_MASS * ModelConfig.timestep;
+            double dvx = points.get(i).getForceX() / mass * ModelConfig.timestep;
+            double dvy = points.get(i).getForceY() / mass * ModelConfig.timestep;
 
             points.get(i).getVelocity().add(dvx, dvy);
 
@@ -426,8 +429,8 @@ public class SoftBody implements ReadOnlySoftBody {
 
         for (int i = 0; i < NUM_POINTS; i++) {
 
-            double dvx = (points.get(i).getForceX() + ForceSaved.get(i).getX()) / SOFTBODY_MASS * ModelConfig.timestep;
-            double dvy = (points.get(i).getForceY() + ForceSaved.get(i).getY()) / SOFTBODY_MASS * ModelConfig.timestep;
+            double dvx = (points.get(i).getForceX() + ForceSaved.get(i).getX()) / mass * ModelConfig.timestep;
+            double dvy = (points.get(i).getForceY() + ForceSaved.get(i).getY()) / mass * ModelConfig.timestep;
 
             points.get(i).setVelocityX(VelocitySaved.get(i).getX() + dvx / 2.0);
             points.get(i).setVelocityY(VelocitySaved.get(i).getY() + dvy / 2.0);
@@ -438,9 +441,10 @@ public class SoftBody implements ReadOnlySoftBody {
             points.get(i).addPosition(deltaRotationX, deltaRotationY);
 
             // keep track of min and max values for bounding box
-            handleSoftBodyCollisions(i);
-            handleRigidCollisions(i);
-            handlePointCollisions(i);
+            handleSoftBodyCollision(i);
+            handleRigidCollision(i);
+            handlePointCollision(i);
+            handlePolygonCollision(i);
         }
 
     }
@@ -467,7 +471,7 @@ public class SoftBody implements ReadOnlySoftBody {
      * 
      * @param i index of the point
      */
-    void handleSoftBodyCollisions(int i) {
+    void handleSoftBodyCollision(int i) {
         for (int j = 0; j < softBodies.size(); j++) {
 
             // skip self collision
@@ -521,13 +525,13 @@ public class SoftBody implements ReadOnlySoftBody {
                 // calculate impulse
                 double p = 2 * ((vx * n.getX() + vy * n.getY()) - (o_vx * n.getX() + o_vy *
                         n.getY()))
-                        / (SOFTBODY_MASS + softBodies.get(j).SOFTBODY_MASS);
+                        / (mass + softBodies.get(j).mass);
 
-                double vx1 = vx - (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
-                double vy1 = vy - (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
+                double vx1 = vx - (p * softBodies.get(j).mass * n.getX());
+                double vy1 = vy - (p * softBodies.get(j).mass * n.getY());
 
-                double vx2 = o_vx + (p * SOFTBODY_MASS * n.getX());
-                double vy2 = o_vy + (p * SOFTBODY_MASS * n.getY());
+                double vx2 = o_vx + (p * mass * n.getX());
+                double vy2 = o_vy + (p * mass * n.getY());
 
                 vx1 *= ModelConfig.BOUNCINESS;
                 vy1 *= ModelConfig.BOUNCINESS;
@@ -559,13 +563,13 @@ public class SoftBody implements ReadOnlySoftBody {
             double edgeVy = (o_vy + softBodies.get(j).points.get(p2).getVelocityY()) / 2.0;
 
             double p = 2 * ((vx * n.getX() + vy * n.getY()) - (edgeVx * n.getX() + edgeVy * n.getY()))
-                    / (SOFTBODY_MASS + softBodies.get(j).SOFTBODY_MASS);
+                    / (mass + softBodies.get(j).mass);
 
-            double vx1 = vx - (p * softBodies.get(j).SOFTBODY_MASS * n.getX());
-            double vy1 = vy - (p * softBodies.get(j).SOFTBODY_MASS * n.getY());
+            double vx1 = vx - (p * softBodies.get(j).mass * n.getX());
+            double vy1 = vy - (p * softBodies.get(j).mass * n.getY());
 
-            double vx2 = edgeVx + (p * SOFTBODY_MASS * n.getX());
-            double vy2 = edgeVy + (p * SOFTBODY_MASS * n.getY());
+            double vx2 = edgeVx + (p * mass * n.getX());
+            double vy2 = edgeVy + (p * mass * n.getY());
 
             vx1 *= ModelConfig.BOUNCINESS;
             vy1 *= ModelConfig.BOUNCINESS;
@@ -587,7 +591,7 @@ public class SoftBody implements ReadOnlySoftBody {
      * 
      * @param i index of the point
      */
-    void handleRigidCollisions(int i) {
+    void handleRigidCollision(int i) {
         // collision with ground
         if (points.get(i).getPosition().getY() >= ViewConfig.PANEL_HEIGHT - ModelConfig.WALL_THICKNESS) {
             points.get(i).getPosition().setY(ViewConfig.PANEL_HEIGHT - ModelConfig.WALL_THICKNESS);
@@ -628,7 +632,7 @@ public class SoftBody implements ReadOnlySoftBody {
      * 
      * @param i index of the point
      */
-    void handlePointCollisions(int i) {
+    void handlePointCollision(int i) {
         for (int j = 0; j < NUM_POINTS; j++) {
 
             if (i == j) {
@@ -663,15 +667,97 @@ public class SoftBody implements ReadOnlySoftBody {
                     + points.get(p1).getVelocityY() * normalVector.getY()
                     - points.get(p2).getVelocityX() * normalVector.getX()
                     + points.get(p2).getVelocityY() * normalVector.getY())
-                    / (SOFTBODY_MASS + SOFTBODY_MASS);
+                    / (mass + mass);
 
-            double vx1 = points.get(p1).getVelocityX() - p * SOFTBODY_MASS * normalVector.getX();
-            double vy1 = points.get(p1).getVelocityY() - p * SOFTBODY_MASS * normalVector.getY();
-            double vx2 = points.get(p2).getVelocityX() + p * SOFTBODY_MASS * normalVector.getX();
-            double vy2 = points.get(p2).getVelocityY() + p * SOFTBODY_MASS * normalVector.getY();
+            double vx1 = points.get(p1).getVelocityX() - p * mass * normalVector.getX();
+            double vy1 = points.get(p1).getVelocityY() - p * mass * normalVector.getY();
+            double vx2 = points.get(p2).getVelocityX() + p * mass * normalVector.getX();
+            double vy2 = points.get(p2).getVelocityY() + p * mass * normalVector.getY();
 
             points.get(p1).setVelocity(vx1, vy1);
             points.get(p2).setVelocity(vx2, vy2);
+        }
+    }
+
+    void handlePolygonCollision(int i) {
+        for (int j = 0; j < polygons.size(); j++) {
+
+            // skip if theres no collision
+            if (!checkCollision(points.get(i).getPosition(), polygons.get(j))) {
+                continue;
+            }
+
+            // skip if this point is at the same position as the closest point
+            if (points.get(i).getPosition().equals(closestPoint)) {
+                continue;
+            }
+
+            Vector2D n = new Vector2D(points.get(i).getPositionX() - closestPoint.getX(),
+                    points.get(i).getPositionY() - closestPoint.getY());
+
+            // // velocity of this point
+            double vx = points.get(i).getVelocityX();
+            double vy = points.get(i).getVelocityY();
+
+            // // handle vertex collisions
+            // if (p2 == -1) {
+            // // System.out.println("Handling vertex collision with: " + j);
+
+            // points.get(i).setPosition(newX1, newY1);
+            // softBodies.get(j).points.get(p1).setPosition(newX2, newY2);
+
+            // n.normalize();
+            // // calculate impulse
+            // double p = 2 * ((vx * n.getX() + vy * n.getY()) - (o_vx * n.getX() + o_vy *
+            // n.getY()))
+            // / (mass + softBodies.get(j).mass);
+
+            // double vx1 = vx - (p * softBodies.get(j).mass * n.getX());
+            // double vy1 = vy - (p * softBodies.get(j).mass * n.getY());
+
+            // double vx2 = o_vx + (p * mass * n.getX());
+            // double vy2 = o_vy + (p * mass * n.getY());
+
+            // vx1 *= ModelConfig.BOUNCINESS;
+            // vy1 *= ModelConfig.BOUNCINESS;
+            // vx2 *= ModelConfig.BOUNCINESS;
+            // vy2 *= ModelConfig.BOUNCINESS;
+
+            // points.get(i).setVelocity(vx1, vy1);
+            // softBodies.get(j).points.get(p1).setVelocity(vx2, vy2);
+
+            // continue; // skip the rest
+            // }
+
+            // double newX3 = softBodies.get(j).points.get(p2).getPositionX() + n.getX();
+            // double newY3 = softBodies.get(j).points.get(p2).getPositionY() + n.getY();
+
+            // // Calculate the new positions for the edge points using the closestToSingle
+            // // vector
+
+            points.get(i).setPosition(closestPoint);
+
+            // softBodies.get(j).points.get(p1).setPosition(newX2, newY2);
+            // softBodies.get(j).points.get(p2).setPosition(newX3, newY3);
+
+            // // normalize for the collision calculations
+            // n.normalize();
+
+            // // handle edge collisions
+            // double edgeVx = (o_vx + softBodies.get(j).points.get(p2).getVelocityX()) /
+            // 2.0;
+            // double edgeVy = (o_vy + softBodies.get(j).points.get(p2).getVelocityY()) /
+            // 2.0;
+
+            double p = 2 * ((points.get(i).getVelocity().getX() * n.getX()
+                    + points.get(i).getVelocity().getY() * n.getY())
+                    - (0 * n.getX() + 0 * n.getY())) / (mass + 1);
+
+            double vx1 = vx - (p * softBodies.get(j).mass * n.getX());
+            double vy1 = vy - (p * softBodies.get(j).mass * n.getY());
+
+            points.get(i).setVelocity(vx1, vy1);
+
         }
     }
 
@@ -738,6 +824,34 @@ public class SoftBody implements ReadOnlySoftBody {
         return intersectionCount % 2 == 1;
     }
 
+    public boolean checkCollision(Point2D position, Polygon2D other) {
+
+        // Check if the point is inside the bounding box
+        if (!other.contains(position.getX(), position.getY())) {
+            return false;
+        }
+
+        int points = other.npoints;
+        closestPoint = new Point2D(other.points.get(0));
+        for (int i = 0; i < points; i++) {
+            Point2D edgeStart = other.points.get(i);
+            Point2D edgeEnd = other.points.get((i + 1) % points);
+
+            Point2D tempClosestPoint = SoftBodyUtil.closestPointOnLineSegment(position, edgeStart, edgeEnd);
+
+            double tempDistance = position.distance(tempClosestPoint);
+            double oldDistance = position.distance(closestPoint);
+
+            // check if the closest point is on an edge and closer than the previous closest
+            if (tempDistance <= oldDistance) {
+                // this should probably only be set if theres actually a collision
+                closestPoint.setLocation(tempClosestPoint.getX(), tempClosestPoint.getY());
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public int getNumPoints() {
         return this.NUM_POINTS;
@@ -797,7 +911,7 @@ public class SoftBody implements ReadOnlySoftBody {
 
     @Override
     public double getSpringConstant() {
-        return this.SPRING_CONSTANT;
+        return this.springConstant;
     }
 
     @Override
@@ -812,7 +926,7 @@ public class SoftBody implements ReadOnlySoftBody {
 
     @Override
     public double getMass() {
-        return this.SOFTBODY_MASS;
+        return this.mass;
     }
 
 }

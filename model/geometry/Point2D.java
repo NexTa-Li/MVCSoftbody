@@ -85,6 +85,11 @@ public class Point2D {
         this.y = y;
     }
 
+    public void translate(double x, double y) {
+        this.x += x;
+        this.y += y;
+    }
+
     @Override
     public boolean equals(Object o) {
 

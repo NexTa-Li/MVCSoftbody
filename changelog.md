@@ -177,3 +177,23 @@
 `input flags` in `SoftBodyController.java`: Removed the input flags since they are already being set when a key is pressed directly to the model by the controller.
 
 `keyPressed()` and `keyReleased()` in `SoftBody.java`: Removed the methods since they are now exclusively handled in `SoftBodyController.java`
+
+# **[Version 1.2.0]** - 2023-09-16 - Polygon Collisions
+
+### Added
+
+- `Polygon2D.java`: Added a class that represents a polygon with double precision.
+
+- `translate()` in `Point2D.java` & `Rectangle.java`: Added a method that translates the point or rectangle by a given x and y value.
+
+- `ReadOnlyPolygon2D` class: Added a class that represents a read only polygon with double precision.
+
+- `getReadOnlyPolygons()` in `ReadOnlyModel` & implemented in `SoftBodyModel.java`: Added a method that returns a list of read only polygons that represent the softbodies.
+
+- `default constructor` in `Rectangle`
+
+- `handleBoundaryCollision()` in `SoftBody.java`: Added a method that handles collisions with polygons/ obstacles.
+
+### Changed
+
+`var names` in `SoftBody.java`: Changed the names of some variables that used to have final signatures.

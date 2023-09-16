@@ -14,6 +14,8 @@ import controller.SoftBodyController;
 import model.ModelConfig;
 import model.ReadOnlyModel;
 import model.SoftBodyModel;
+
+import model.geometry.ReadOnlyPolygon2D;
 import model.masspoint.MassPoint;
 import model.masspoint.ReadOnlyMassPoint;
 import model.softbody.ReadOnlySoftBody;
@@ -22,6 +24,7 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
     ReadOnlyModel model;
     SoftBodyController controller;
     List<ReadOnlySoftBody> softBodies;
+    List<ReadOnlyPolygon2D> polygons;
 
     Thread thread;
 
@@ -29,6 +32,7 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
         this.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         this.model = model;
         this.softBodies = model.getReadOnlySoftBodies();
+        this.polygons = model.getReadOnlyPolygons();
         this.controller = controller;
         this.setBackground(Color.black);
         this.setFocusable(true);
@@ -80,35 +84,13 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
         List<ReadOnlyMassPoint> points;
         ReadOnlySoftBody body;
 
-        // if (drawStats) {
-        // g.setColor(new Color(255, 255, 255, 122));
-        // g.fillRect(0, 0, 235, 200);
+        // draw polygons
 
-        // // g.setColor(totalAvgColor);
-        // g.setColor(Color.black);
-        // g.drawString("Softbody Count: ", 10, 20);
-        // g.drawString(softBodies.size() + "", 120, 20);
+        for (int i = 0; i < polygons.size(); i++) {
+            g.setColor(Color.WHITE);
 
-        // g.drawString("Gravity: ", 10, 40);
-        // g.drawString(model.getGravity() + "", 120, 40);
-
-        // // g.drawString("Gravity Swap: ", 10, 60);
-        // // g.drawString(gravitySwap + "", 120, 60);
-
-        // // g.drawString("Wall Color Swap: ", 10, 80);
-        // // g.drawString(wallColorSwap + "", 120, 80);
-
-        // g.drawString("User Force", 10, 100);
-        // g.drawString(ModelConfig.USER_FORCE + "", 120, 100);
-
-        // g.drawString("\u03BC ", 10, 120);
-        // g.drawString(ModelConfig.SURFACE_FRICTION_COEFFICIENT + "", 120, 120);
-
-        // g.drawString("Collision Bounce: ", 10, 140);
-        // g.drawString(ModelConfig.BOUNCINESS + "", 120, 140);
-
-        // // background colour
-        // }
+            g.drawPolygon(polygons.get(i).getXArr(), polygons.get(i).getYArr(), polygons.get(i).getNumPoints());
+        }
 
         for (int i = 0; i < softBodies.size(); i++) {
             points = softBodies.get(i).getPoints();

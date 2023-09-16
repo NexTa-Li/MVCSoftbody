@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.ArrayList;
 
+import model.geometry.Polygon2D;
+import model.geometry.ReadOnlyPolygon2D;
 import model.geometry.Vector2D;
 import model.softbody.ReadOnlySoftBody;
 import model.softbody.SoftBody;
@@ -12,8 +14,9 @@ import view.ViewConfig;
 
 public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
-    public static Vector2D gravity = new Vector2D(0, 0);
+    public static Vector2D gravity = new Vector2D(0, 250);
     List<SoftBody> softBodies;
+    List<Polygon2D> polygons;
     Thread thread;
 
     // graphical settings that can be changed by the controller
@@ -27,12 +30,31 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
     public SoftBodyModel() {
 
+        createPolygons();
         createSoftBodies();
+
+        // softBodies.add(new SoftBody(500, 200, 64, RADIUS, MASS, SPRING_CONSTANT,
+        // 60, FINAL_PRESSURE, softBodies, polygons));
+
         thread = new Thread(this);
 
         if (!DEBUG_MODE) {
             thread.start();
         }
+    }
+
+    void createPolygons() {
+        this.polygons = new ArrayList<Polygon2D>();
+
+        Polygon2D p1 = new Polygon2D();
+
+        p1.addPoint(300, 500);
+        p1.addPoint(550, 590);
+        p1.addPoint(800, 500);
+        p1.addPoint(600, 600);
+        p1.addPoint(500, 600);
+
+        polygons.add(p1);
     }
 
     void createSoftBodies() {
@@ -46,7 +68,7 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
             for (int i = 0; i < NUM_SOFTBODIES; i++) {
 
                 SoftBody softBody = new SoftBody(X, Y, NUM_POINTS, RADIUS, MASS, SPRING_CONSTANT,
-                        SPRING_DAMPING, FINAL_PRESSURE, softBodies);
+                        SPRING_DAMPING, FINAL_PRESSURE, softBodies, polygons);
 
                 // set random color
                 X += 300;
@@ -78,7 +100,7 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
                 }
             }
             SoftBody softBody = new SoftBody(rX, rY, NUM_POINTS, RADIUS, MASS, SPRING_CONSTANT,
-                    SPRING_DAMPING, FINAL_PRESSURE, softBodies);
+                    SPRING_DAMPING, FINAL_PRESSURE, softBodies, polygons);
 
             softBodies.add(softBody);
             i++;
@@ -184,6 +206,11 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
     @Override
     public boolean isBodyInfoDrawn() {
         return this.drawBodyInfo;
+    }
+
+    @Override
+    public ArrayList<ReadOnlyPolygon2D> getReadOnlyPolygons() {
+        return new ArrayList<ReadOnlyPolygon2D>(polygons);
     }
 
 }

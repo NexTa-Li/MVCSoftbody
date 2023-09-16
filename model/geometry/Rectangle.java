@@ -13,6 +13,10 @@ public class Rectangle {
         this.height = height;
     }
 
+    public Rectangle() {
+        this(0, 0, 0, 0);
+    }
+
     public boolean contains(double x, double y) {
         return (x >= this.x &&
                 y >= this.y &&
@@ -60,5 +64,10 @@ public class Rectangle {
 
     public int heightToInt() {
         return (int) height;
+    }
+
+    public void translate(double x, double y) {
+        this.x += x;
+        this.y += y;
     }
 }
