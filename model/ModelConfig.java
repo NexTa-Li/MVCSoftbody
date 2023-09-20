@@ -2,14 +2,14 @@ package model;
 
 public interface ModelConfig {
     // Physical constants
-    static final int FILL_DURATION = 200; // the higher, the better (helps with volume calculations)
+    static final int FILL_DURATION = 500; // the higher, the better (helps with volume calculations)
     static final double USER_FORCE = 250;
     public static final double BOUNCINESS = 0.97; // 0.95 is a good value
     public static final double SURFACE_FRICTION_COEFFICIENT = 0.02; // 0.01 is a good value
     public static final double AIR_FRICTION_COEFFICIENT = 0.0001; // 0.0001 is a good value
-    static final int NUM_SOFTBODIES = 3;
+    static final int NUM_SOFTBODIES = 10;
 
-    static final int NUM_POINTS = 16;
+    static final int NUM_POINTS = 24;
 
     /**
      * The Radius the softbody will try to maintain. This radius will not always be
@@ -20,7 +20,7 @@ public interface ModelConfig {
      * This means that the resting length of each spring is also
      * determined by this value.
      */
-    static final double RADIUS = 45.0;
+    static final double RADIUS = 1.0;
 
     /**
      * The Mass of each mass point in the softbody. This determines how much the
@@ -39,7 +39,7 @@ public interface ModelConfig {
      * The spring constant of the softbody. this determines how much the springs
      * will try to maintain their resting length.
      */
-    static final double SPRING_CONSTANT = 10700.0;
+    static final double SPRING_CONSTANT = 3700.0;
     static final double SPRING_DAMPING = 30.0;
     static final double FINAL_PRESSURE = 150_000.0;
 

@@ -2,6 +2,7 @@ package controller;
 
 import model.SoftBodyModel;
 import model.geometry.Point2D;
+import model.polygon.BouncePad;
 import model.softbody.SoftBodyUtil;
 
 import java.awt.event.*;
@@ -61,7 +62,7 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
             // System.out.println("Mouse pressed at: " + mouseX + ", " + mouseY);
             System.out.println(".addPoint(" + mouseX + ", " + mouseY + ");");
 
-            for (int i = 0; i < model.getSoftBodies().size(); i++) {
+            for (int i = 0; i < model.getSoftBodyHandlers().size(); i++) {
                 if (SoftBodyUtil.checkCollision(new Point2D(mouseX, mouseY), model.getSoftBodies().get(i))) {
                     System.out.println("Soft body " + i + " was clicked on");
                     // update display info
@@ -96,36 +97,41 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
             model.drawBodyInfo = !model.drawBodyInfo;
 
         if (e.getKeyCode() == KeyEvent.VK_UP)
-            model.getSoftBodies().get(model.getId()).keyUp = true;
+            model.getSoftBodyHandlers().get(model.getId()).keyUp = true;
         if (e.getKeyCode() == KeyEvent.VK_DOWN)
-            model.getSoftBodies().get(model.getId()).keyDown = true;
+            model.getSoftBodyHandlers().get(model.getId()).keyDown = true;
         if (e.getKeyCode() == KeyEvent.VK_LEFT)
-            model.getSoftBodies().get(model.getId()).keyLeft = true;
+            model.getSoftBodyHandlers().get(model.getId()).keyLeft = true;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-            model.getSoftBodies().get(model.getId()).keyRight = true;
+            model.getSoftBodyHandlers().get(model.getId()).keyRight = true;
         if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_EQUALS)
-            model.getSoftBodies().get(model.getId()).increase = true;
+            model.getSoftBodyHandlers().get(model.getId()).increase = true;
         if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_UNDERSCORE)
-            model.getSoftBodies().get(model.getId()).decrease = true;
+            model.getSoftBodyHandlers().get(model.getId()).decrease = true;
         if (e.getKeyCode() == KeyEvent.VK_7) {
             System.out.println("Pressure Change");
-            model.getSoftBodies().get(model.getId()).resetChangeVars();
-            model.getSoftBodies().get(model.getId()).pressureChange = true;
+            model.getSoftBodyHandlers().get(model.getId()).resetChangeVars();
+            model.getSoftBodyHandlers().get(model.getId()).pressureChange = true;
         }
         if (e.getKeyCode() == KeyEvent.VK_8) {
             System.out.println("Mass Change");
-            model.getSoftBodies().get(model.getId()).resetChangeVars();
-            model.getSoftBodies().get(model.getId()).massChange = true;
+            model.getSoftBodyHandlers().get(model.getId()).resetChangeVars();
+            model.getSoftBodyHandlers().get(model.getId()).massChange = true;
         }
         if (e.getKeyCode() == KeyEvent.VK_9) {
             System.out.println("Spring Constant Change");
-            model.getSoftBodies().get(model.getId()).resetChangeVars();
-            model.getSoftBodies().get(model.getId()).springConstantChange = true;
+            model.getSoftBodyHandlers().get(model.getId()).resetChangeVars();
+            model.getSoftBodyHandlers().get(model.getId()).springConstantChange = true;
         }
         if (e.getKeyCode() == KeyEvent.VK_0) {
             System.out.println("Spring Length Change");
-            model.getSoftBodies().get(model.getId()).resetChangeVars();
-            model.getSoftBodies().get(model.getId()).springLengthChange = true;
+            model.getSoftBodyHandlers().get(model.getId()).resetChangeVars();
+            model.getSoftBodyHandlers().get(model.getId()).springLengthChange = true;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_1) {
+            model.p1.toggleBounce();
+
         }
 
         // used to test frame by frame
@@ -137,17 +143,17 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
     public void keyReleased(KeyEvent e) {
 
         if (e.getKeyCode() == KeyEvent.VK_UP)
-            model.getSoftBodies().get(model.getId()).keyUp = false;
+            model.getSoftBodyHandlers().get(model.getId()).keyUp = false;
         if (e.getKeyCode() == KeyEvent.VK_DOWN)
-            model.getSoftBodies().get(model.getId()).keyDown = false;
+            model.getSoftBodyHandlers().get(model.getId()).keyDown = false;
         if (e.getKeyCode() == KeyEvent.VK_LEFT)
-            model.getSoftBodies().get(model.getId()).keyLeft = false;
+            model.getSoftBodyHandlers().get(model.getId()).keyLeft = false;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-            model.getSoftBodies().get(model.getId()).keyRight = false;
+            model.getSoftBodyHandlers().get(model.getId()).keyRight = false;
         if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_EQUALS)
-            model.getSoftBodies().get(model.getId()).increase = false;
+            model.getSoftBodyHandlers().get(model.getId()).increase = false;
         if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_UNDERSCORE)
-            model.getSoftBodies().get(model.getId()).decrease = false;
+            model.getSoftBodyHandlers().get(model.getId()).decrease = false;
     }
 
     @Override

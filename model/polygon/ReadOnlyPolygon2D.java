@@ -1,4 +1,4 @@
-package model.geometry;
+package model.polygon;
 
 public interface ReadOnlyPolygon2D {
     public int[] getXArr();

@@ -2,8 +2,8 @@ package model;
 
 import java.util.ArrayList;
 
-import model.geometry.ReadOnlyPolygon2D;
 import model.geometry.Vector2D;
+import model.polygon.ReadOnlyPolygon2D;
 import model.softbody.ReadOnlySoftBody;
 
 public interface ReadOnlyModel {

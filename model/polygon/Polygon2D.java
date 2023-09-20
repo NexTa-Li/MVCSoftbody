@@ -1,20 +1,28 @@
-package model.geometry;
+package model.polygon;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Polygon2D implements ReadOnlyPolygon2D {
+import model.geometry.Point2D;
+import model.geometry.Rectangle;
+import model.masspoint.MassPoint;
+
+public abstract class Polygon2D implements ReadOnlyPolygon2D {
     public int npoints;
 
     // coordinates of the points
-    public List<Point2D> points;
+    public List<MassPoint> points;
 
     protected Rectangle bounds; // double precision bounds
     private static final int MIN_LENGTH = 4;
 
-    public Polygon2D() {
-        this.points = new ArrayList<Point2D>(MIN_LENGTH);
+    protected double mass;
+
+    public Polygon2D(double mass) {
+        this.points = new ArrayList<MassPoint>(MIN_LENGTH);
         this.bounds = new Rectangle();
+
+        this.mass = mass;
     }
 
     /**
@@ -25,9 +33,9 @@ public class Polygon2D implements ReadOnlyPolygon2D {
      * @param deltaX the amount to translate along the X axis
      * @param deltaY the amount to translate along the Y axis
      */
-    public void translate(int deltaX, int deltaY) {
+    public void translate(double deltaX, double deltaY) {
         for (int i = 0; i < npoints; i++) {
-            points.get(i).translate(deltaX, deltaY);
+            points.get(i).getPosition().translate(deltaX, deltaY);
         }
 
         if (bounds != null) {
@@ -61,7 +69,7 @@ public class Polygon2D implements ReadOnlyPolygon2D {
     }
 
     public void addPoint(double x, double y) {
-        this.points.add(new Point2D(x, y));
+        this.points.add(new MassPoint(new Point2D(x, y)));
 
         npoints++;
         if (bounds != null) {
@@ -75,14 +83,14 @@ public class Polygon2D implements ReadOnlyPolygon2D {
         }
         int hits = 0;
 
-        double lastx = points.get(npoints - 1).x;
-        double lasty = points.get(npoints - 1).y;
+        double lastx = points.get(npoints - 1).getPosition().getX();
+        double lasty = points.get(npoints - 1).getPosition().getY();
         double curx, cury;
 
         // Walk the edges of the polygon
         for (int i = 0; i < npoints; lastx = curx, lasty = cury, i++) {
-            curx = points.get(i).x;
-            cury = points.get(i).y;
+            curx = points.get(i).getPosition().getX();
+            cury = points.get(i).getPosition().getY();
 
             if (cury == lasty) {
                 continue;
@@ -136,7 +144,7 @@ public class Polygon2D implements ReadOnlyPolygon2D {
     public int[] getXArr() {
         int[] x = new int[npoints];
         for (int i = 0; i < npoints; i++) {
-            x[i] = (int) points.get(i).x;
+            x[i] = (int) points.get(i).getPosition().getX();
         }
         return x;
     }
@@ -145,7 +153,7 @@ public class Polygon2D implements ReadOnlyPolygon2D {
     public int[] getYArr() {
         int[] y = new int[npoints];
         for (int i = 0; i < npoints; i++) {
-            y[i] = (int) points.get(i).y;
+            y[i] = (int) points.get(i).getPosition().getY();
         }
         return y;
     }

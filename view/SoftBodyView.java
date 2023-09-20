@@ -13,11 +13,8 @@ import javax.swing.JPanel;
 import controller.SoftBodyController;
 import model.ModelConfig;
 import model.ReadOnlyModel;
-import model.SoftBodyModel;
-
-import model.geometry.ReadOnlyPolygon2D;
-import model.masspoint.MassPoint;
 import model.masspoint.ReadOnlyMassPoint;
+import model.polygon.ReadOnlyPolygon2D;
 import model.softbody.ReadOnlySoftBody;
 
 public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
@@ -89,7 +86,7 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
         for (int i = 0; i < polygons.size(); i++) {
             g.setColor(Color.WHITE);
 
-            g.drawPolygon(polygons.get(i).getXArr(), polygons.get(i).getYArr(), polygons.get(i).getNumPoints());
+            g.fillPolygon(polygons.get(i).getXArr(), polygons.get(i).getYArr(), polygons.get(i).getNumPoints());
         }
 
         for (int i = 0; i < softBodies.size(); i++) {

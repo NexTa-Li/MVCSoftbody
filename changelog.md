@@ -197,3 +197,26 @@
 ### Changed
 
 `var names` in `SoftBody.java`: Changed the names of some variables that used to have final signatures.
+
+# **[Version 1.2.1]** - 2023-09-16 - Polygon Refactoring
+
+### Added
+
+`SoftBodyHandler` class: Added a class that handles the updating of softbodies.
+`BouncePad` class: Added a class that represents a bounce pad which is a subclass of `Polygon2D`.
+`getSoftBodyHandlers()` in `SoftBodyModel.java`: Added a method that returns a list of softbody handlers.
+
+### Removed
+
+`SoftBodyCode.md`: removed this file, the current implementation is likely permanent.
+
+### Changed
+
+`List<Point2D> points` in `Polygon2D.java` to `List<MassPoint> points`: Changed the type of the list to `MassPoint` so that subclasses of the polygon class can be moved around, and have momentum/ carry force like softbodies.
+`Polygon2D` is now an abstract class.
+
+### Moved
+
+`Polygon2D` to `polygon` package: Moved the class to the polygon package to support expansion into sub classes of polygon.
+
+`All Handler Methods` in `SoftBody` to `SoftBodyHandler.java`: Moved all the handler/ updater methods to the handler class.
