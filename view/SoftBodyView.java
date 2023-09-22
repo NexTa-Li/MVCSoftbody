@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import controller.SoftBodyController;
 import model.ModelConfig;
 import model.ReadOnlyModel;
+import model.Spring;
 import model.masspoint.ReadOnlyMassPoint;
 import model.polygon.ReadOnlyPolygon2D;
 import model.softbody.ReadOnlySoftBody;
@@ -38,7 +39,7 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
         this.addKeyListener(controller);
         this.addMouseListener(controller);
         this.addMouseMotionListener(controller);
-
+        this.addMouseWheelListener(controller);
         this.thread = new Thread(this);
         this.thread.start();
 
@@ -79,10 +80,10 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
         Graphics2D g = (Graphics2D) graphics;
         g.setStroke(new BasicStroke(2));
         List<ReadOnlyMassPoint> points;
+        List<Spring> springs;
         ReadOnlySoftBody body;
 
         // draw polygons
-
         for (int i = 0; i < polygons.size(); i++) {
             g.setColor(Color.WHITE);
 
@@ -90,21 +91,23 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
         }
 
         for (int i = 0; i < softBodies.size(); i++) {
-            points = softBodies.get(i).getPoints();
             body = softBodies.get(i);
+            points = body.getPoints();
+            springs = body.getSprings();
 
             if (model.isBodyFilled()) {
                 g.setColor(Color.gray);
-                g.fillPolygon(body.getXArr(), body.getYArr(), points.size());
+                g.fillPolygon(body.getXArr(), body.getYArr(), body.getYArr().length);
             }
 
             if (model.isSpringsDrawn()) {
                 g.setColor(Color.WHITE);
-                for (int j = 0; j < points.size(); j++) {
-                    g.drawLine((int) points.get(j).getPosition().getX(),
-                            (int) points.get(j).getPosition().getY(),
-                            (int) points.get((j + 1) % points.size()).getPosition().getX(),
-                            (int) points.get((j + 1) % points.size()).getPosition().getY());
+
+                for (int j = 0; j < springs.size(); j++) {
+                    g.drawLine((int) points.get(springs.get(j).getP1()).getPosition().getX(),
+                            (int) points.get(springs.get(j).getP1()).getPosition().getY(),
+                            (int) points.get(springs.get((j)).getP2()).getPosition().getX(),
+                            (int) points.get(springs.get((j)).getP2()).getPosition().getY());
                 }
             }
 
@@ -153,7 +156,7 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
         g.drawString(String.format("%,.2f", body.getMass()) + "", 120, PANEL_HEIGHT / 2 + 60);
 
         g.drawString("Mass Points: ", 10, PANEL_HEIGHT / 2 + 80);
-        g.drawString(body.getNumPoints() + "", 120, PANEL_HEIGHT / 2 + 80);
+        g.drawString(body.getPoints().size() + "", 120, PANEL_HEIGHT / 2 + 80);
 
         g.drawString("Spring Constant: ", 10, PANEL_HEIGHT / 2 + 100);
         g.drawString(String.format("%,.2f", body.getSpringConstant()) + "", 120, PANEL_HEIGHT / 2 + 100);
@@ -173,18 +176,18 @@ public class SoftBodyView extends JPanel implements Runnable, ViewConfig {
         // g.fillRect(10, PANEL_HEIGHT / 2 + 165, 215, 20);
 
         // drawing selected point
-        // g.setColor(Color.black);
-        // g.drawString("Selected Point: ", 10, PANEL_HEIGHT / 2 + 200);
-        // g.drawString("" + selectedPoint, 120, PANEL_HEIGHT / 2 + 200);
+        g.setColor(Color.black);
+        g.drawString("Selected Point: ", 10, PANEL_HEIGHT / 2 + 200);
+        g.drawString("" + model.getSelectedPoint(), 120, PANEL_HEIGHT / 2 + 200);
 
         // // draw a circle around the selected point
-        // g.setColor(Color.black);
-        // g.drawOval((int)
-        // (softBodies.get(selectedSoftbodyIndex).points.get(selectedPoint).position.x -
-        // 8),
-        // (int)
-        // (softBodies.get(selectedSoftbodyIndex).points.get(selectedPoint).position.y -
-        // 8), 16, 16);
+        g.setColor(Color.black);
+        g.drawOval(
+                (int) (softBodies.get(model.getId()).getPoints().get(model.getSelectedPoint()).getPosition().getX()
+                        - 8),
+                (int) (softBodies.get(model.getId()).getPoints().get(model.getSelectedPoint()).getPosition().getY()
+                        - 8),
+                16, 16);
 
         // g.drawString("Velocity: ", 10, PANEL_HEIGHT / 2 + 220);
         // g.drawString(df.format(softBodies.get(selectedSoftbodyIndex).points.get(selectedPoint).velocity.x)

@@ -9,7 +9,10 @@ public class SoftBodyUtil {
     private SoftBodyUtil() {
     }
 
-    public static boolean checkCollision(Point2D position, SoftBody other) {
+    /*
+     * uses the external points of the body to check if the point is inside
+     */
+    public static boolean checkCollision(Point2D position, Body other) {
         // Check if the point is inside the bounding box of the other soft body
         if (!other.boundingBox.contains(position.getX(), position.getY())) {
             return false;
@@ -17,11 +20,11 @@ public class SoftBodyUtil {
 
         Line2D ray = new Line2D.Double(0, position.getY(), position.getX(), position.getY());
 
-        int points = other.points.size();
+        int points = other.points().size();
         int intersectionCount = 0;
         for (int i = 0; i < points; i++) {
-            Point2D edgeStart = new Point2D(other.points.get(i).getPosition());
-            Point2D edgeEnd = new Point2D(other.points.get((i + 1) % points).getPosition());
+            Point2D edgeStart = new Point2D(other.points().get(i).getPosition());
+            Point2D edgeEnd = new Point2D(other.points().get((i + 1) % points).getPosition());
 
             if (SoftBodyUtil.checkIntersection(ray, edgeStart, edgeEnd)) {
                 intersectionCount++;
@@ -104,7 +107,7 @@ public class SoftBodyUtil {
      * @param other the second softbody
      * @return true if the softbodies are merged, false otherwise
      */
-    public static boolean isMerged(SoftBody body, SoftBody other) {
+    public static boolean isMerged(Body body, Body other) {
         if (body == other) {
             return true;
         }

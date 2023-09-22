@@ -8,30 +8,32 @@ import model.geometry.Vector2D;
 import model.polygon.BouncePad;
 import model.polygon.Polygon2D;
 import model.polygon.ReadOnlyPolygon2D;
+import model.softbody.Body;
+import model.softbody.PressurizedSoftBody;
 import model.softbody.ReadOnlySoftBody;
 import model.softbody.SoftBody;
 import model.softbody.SoftBodyHandler;
-import model.softbody.SoftBodyUtil;
 import view.ViewConfig;
 
 public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
 
-    public static Vector2D gravity = new Vector2D(0, 250);
-    public List<SoftBody> softBodies;
+    public static Vector2D gravity = new Vector2D(0, 210);
+    public List<Body> softBodies;
     public List<SoftBodyHandler> softBodyHandlers;
     public List<Polygon2D> polygons;
     Thread thread;
 
-    public BouncePad p1 = new BouncePad(2.0, new Vector2D(0, -5), 200, 5);
+    public BouncePad p1 = new BouncePad(2.0, new Vector2D(0, 5), 100, 5);
 
     // graphical settings that can be changed by the controller
     public boolean bodyFilled = true;
-    public boolean pointsDrawn = false;
+    public boolean pointsDrawn = true;
     public boolean springsDrawn = false;
     public boolean boundsDrawn = false;
     public boolean drawBodyInfo = false;
 
     public int selectedSoftbodyIndex = 0;
+    public int selectedPoint = 0;
 
     public SoftBodyModel() {
 
@@ -49,30 +51,23 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
         }
     }
 
-    void createPolygons() {
-        this.polygons = new ArrayList<Polygon2D>();
-
-        p1.addPoint(300, 500);
-
-        p1.addPoint(500, 400);
-        p1.addPoint(700, 500);
-        p1.addPoint(500, 600);
-
-        polygons.add(p1);
-    }
-
     void createSoftBodies() {
-        this.softBodies = new ArrayList<SoftBody>();
+        this.softBodies = new ArrayList<Body>();
         this.softBodyHandlers = new ArrayList<SoftBodyHandler>();
+
+        Body body = new SoftBody(25, ViewConfig.PANEL_HEIGHT - 400, ViewConfig.PANEL_WIDTH, 200, 15000, 35, 50,
+                0.75);
+        softBodies.add(body);
+        softBodyHandlers.add(new SoftBodyHandler(body, this));
 
         if (!RANDOM_POSITIONS) {
 
-            int X = 150;
-            int Y = ViewConfig.PANEL_HEIGHT / 2;
+            int X = ViewConfig.PANEL_WIDTH / 2;
+            int Y = 100;
 
             for (int i = 0; i < NUM_SOFTBODIES; i++) {
 
-                SoftBody softBody = new SoftBody(X, Y, NUM_POINTS, RADIUS, MASS, SPRING_CONSTANT,
+                Body softBody = new PressurizedSoftBody(X, Y, NUM_POINTS, RADIUS, MASS, SPRING_CONSTANT,
                         SPRING_DAMPING, FINAL_PRESSURE);
 
                 // set random color
@@ -99,19 +94,33 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
                 if (i - 1 == j)
                     continue;
 
-                if (SoftBodyUtil.isMerged(softBodies.get(i - 1), softBodies.get(j))) {
-                    System.out.println("Softbody " + i + " and " + j + " are merged");
-                    numBodies++;
-                    break;
-                }
+                // if (SoftBodyUtil.isMerged(softBodies.get(i - 1), softBodies.get(j))) {
+                // System.out.println("Softbody " + i + " and " + j + " are merged");
+                // numBodies++;
+                // break;
+                // }
             }
-            SoftBody softBody = new SoftBody(rX, rY, NUM_POINTS, RADIUS, MASS, SPRING_CONSTANT,
+            Body softBody = new PressurizedSoftBody(rX, rY, NUM_POINTS, RADIUS, MASS, SPRING_CONSTANT,
                     SPRING_DAMPING, FINAL_PRESSURE);
 
             softBodies.add(softBody);
             softBodyHandlers.add(new SoftBodyHandler(softBody, this));
             i++;
         }
+    }
+
+    void createPolygons() {
+        this.polygons = new ArrayList<Polygon2D>();
+
+        p1.addPoint(300, 500);
+
+        p1.addPoint(500, 400);
+        p1.addPoint(700, 500);
+        p1.addPoint(500, 600);
+
+        p1.translate(100, -5110);
+
+        polygons.add(p1);
     }
 
     public void idle() {
@@ -173,7 +182,7 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
         }
     }
 
-    public List<SoftBody> getSoftBodies() {
+    public List<Body> getSoftBodies() {
         return this.softBodies;
     }
 
@@ -193,6 +202,10 @@ public class SoftBodyModel implements ReadOnlyModel, Runnable, ModelConfig {
     @Override
     public int getId() {
         return this.selectedSoftbodyIndex;
+    }
+
+    public int getSelectedPoint() {
+        return this.selectedPoint;
     }
 
     @Override

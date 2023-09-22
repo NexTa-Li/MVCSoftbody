@@ -60,7 +60,7 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
             mouseX = e.getX();
             mouseY = e.getY();
             // System.out.println("Mouse pressed at: " + mouseX + ", " + mouseY);
-            System.out.println(".addPoint(" + mouseX + ", " + mouseY + ");");
+            // System.out.println(".addPoint(" + mouseX + ", " + mouseY + ");");
 
             for (int i = 0; i < model.getSoftBodyHandlers().size(); i++) {
                 if (SoftBodyUtil.checkCollision(new Point2D(mouseX, mouseY), model.getSoftBodies().get(i))) {
@@ -68,6 +68,7 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
                     // update display info
 
                     model.selectedSoftbodyIndex = i;
+                    model.selectedPoint = 0;
                     break;
                 }
             }
@@ -134,6 +135,12 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
 
         }
 
+        // set the selected point as fixed
+        if (e.getKeyCode() == KeyEvent.VK_3) {
+            model.getSoftBodyHandlers().get(model.getId()).setFixedPoint(model.selectedPoint);
+
+        }
+
         // used to test frame by frame
         if (e.getKeyCode() == KeyEvent.VK_SPACE)
             model.idle();
@@ -158,16 +165,16 @@ public class SoftBodyController extends KeyAdapter implements MouseListener,
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        // int rotation = e.getWheelRotation();
+        int rotation = e.getWheelRotation();
 
-        // if (rotation > 0) {
-        // SoftBodyPanel.selectedPoint = (SoftBodyPanel.selectedPoint + 1)
-        // % (int) softBodies.get(SoftBodyPanel.selectedSoftbodyIndex).getNumPoints();
+        if (rotation > 0) {
+            model.selectedPoint = (model.selectedPoint + 1)
+                    % (int) model.getSoftBodies().get(model.selectedSoftbodyIndex).getPoints().size();
 
-        // } else {
-        // SoftBodyPanel.selectedPoint = (SoftBodyPanel.selectedPoint - 1
-        // + (int) softBodies.get(SoftBodyPanel.selectedSoftbodyIndex).getNumPoints())
-        // % (int) softBodies.get(SoftBodyPanel.selectedSoftbodyIndex).getNumPoints();
-        // }
+        } else {
+            model.selectedPoint = (model.selectedPoint - 1
+                    + (int) model.getSoftBodies().get(model.selectedSoftbodyIndex).getPoints().size())
+                    % (int) model.getSoftBodies().get(model.selectedSoftbodyIndex).getPoints().size();
+        }
     }
 }

@@ -9,19 +9,19 @@ public interface ReadOnlyMassPoint {
 
     public Point2D getPosition();
 
-    public Double getPositionX();
+    public double getPositionX();
 
-    public Double getPositionY();
+    public double getPositionY();
 
     public Vector2D getVelocity();
 
-    public Double getVelocityX();
+    public double getVelocityX();
 
-    public Double getVelocityY();
+    public double getVelocityY();
 
     public Vector2D getForce();
 
-    public Double getForceX();
+    public double getForceX();
 
-    public Double getForceY();
+    public double getForceY();
 }

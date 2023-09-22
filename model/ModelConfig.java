@@ -2,12 +2,12 @@ package model;
 
 public interface ModelConfig {
     // Physical constants
-    static final int FILL_DURATION = 500; // the higher, the better (helps with volume calculations)
-    static final double USER_FORCE = 250;
-    public static final double BOUNCINESS = 0.97; // 0.95 is a good value
+    static final int FILL_DURATION = 700; // the higher, the better (helps with volume calculations)
+    static final double USER_FORCE = 500;
+    public static final double BOUNCINESS = 1.0; // 0.95 is a good value
     public static final double SURFACE_FRICTION_COEFFICIENT = 0.02; // 0.01 is a good value
     public static final double AIR_FRICTION_COEFFICIENT = 0.0001; // 0.0001 is a good value
-    static final int NUM_SOFTBODIES = 10;
+    static final int NUM_SOFTBODIES = 1;
 
     static final int NUM_POINTS = 24;
 
@@ -39,9 +39,9 @@ public interface ModelConfig {
      * The spring constant of the softbody. this determines how much the springs
      * will try to maintain their resting length.
      */
-    static final double SPRING_CONSTANT = 3700.0;
-    static final double SPRING_DAMPING = 30.0;
-    static final double FINAL_PRESSURE = 150_000.0;
+    static final double SPRING_CONSTANT = 5_000.0;
+    static final double SPRING_DAMPING = 50.0;
+    static final double FINAL_PRESSURE = 3_250_000.0;
 
     static final int WALL_THICKNESS = 3;
 
@@ -66,5 +66,5 @@ public interface ModelConfig {
      * bodies will spawn in a straight line from left to right. This is useful for
      * debugging collisions.
      */
-    static final boolean RANDOM_POSITIONS = true;
+    static final boolean RANDOM_POSITIONS = false;
 }

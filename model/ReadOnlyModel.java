@@ -13,6 +13,8 @@ public interface ReadOnlyModel {
 
     public int getId();
 
+    public int getSelectedPoint();
+
     public Vector2D getGravity();
 
     public boolean isBodyFilled();

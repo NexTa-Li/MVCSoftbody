@@ -1,5 +1,7 @@
 package model.geometry;
 
+import java.util.Objects;
+
 public class Vector2D {
     double x, y;
 
@@ -162,6 +164,27 @@ public class Vector2D {
 
     public double cross(Vector2D v) {
         return this.x * v.y - this.y * v.x;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (o == null)
+            return false;
+
+        if (!(o instanceof Vector2D)) {
+            return false;
+        }
+
+        Vector2D v = (Vector2D) o;
+
+        return (Double.doubleToLongBits(v.getX()) == Double.doubleToLongBits(this.x)
+                && Double.doubleToLongBits(v.getY()) == Double.doubleToLongBits(this.y));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 
     @Override

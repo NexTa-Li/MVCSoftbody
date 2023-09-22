@@ -5,79 +5,19 @@ import java.util.List;
 
 import model.Spring;
 import model.geometry.Point2D;
-import model.geometry.Rectangle;
 import model.masspoint.MassPoint;
 import model.masspoint.ReadOnlyMassPoint;
 
-public class SoftBody implements ReadOnlySoftBody {
-    List<MassPoint> points;
-    List<Spring> springs;
-
+public class SoftBody extends Body {
     final int NUM_POINTS;
-    final double SPRING_DAMPING;
+    List<MassPoint> externalPoints;
 
-    double mass;
-    double springConstant;
-    double targetPressure;
-    double pressure = 0.0;
+    public SoftBody(double x, double y, int width, int height, double ks, double kd, int restLength, double mass) {
+        super(x, y, mass, ks, kd);
 
-    Rectangle boundingBox;
-
-    /*
-     * Maintaining invariants
-     * 
-     * Checks if the position, force or velocity of a point is NaN. If it is, exit
-     * the program. this way we can find out where the NaN is coming from.
-     * 
-     * NaN values will always cause the softbody to explode and dissappear.
-     * 
-     * Modify later if you add other objects that change state.
-     */
-    private void checkNaN(int i, String location) {
-        if (Double.isNaN(points.get(i).getPosition().getX())) {
-            System.out.println("NaN detected " + location);
-            System.out.println("Position NaN");
-            System.exit(0);
-        }
-        if (Double.isNaN(points.get(i).getForce().getX())) {
-            System.out.println("NaN detected " + location);
-            System.out.println("Force NaN");
-            System.exit(0);
-        }
-        if (Double.isNaN(points.get(i).getVelocity().getX())) {
-            System.out.println("NaN detected " + location);
-            System.out.println("Velocity NaN");
-            System.exit(0);
-        }
-    }
-
-    /**
-     * Creates a Softbody object with the specified parameters.
-     * 
-     * @param x          x position of the center of the softbody
-     * @param y          y position of the center of the softbody
-     * @param numPoints  number of points in the softbody
-     * @param radius     radius of the softbody
-     * @param mass       mass of each point in the softbody
-     * @param ks         spring constant
-     * @param kd         spring damping
-     * @param pressure   Final Pressure of the softbody
-     * @param softBodies reference to a list of all other softbodies
-     */
-    public SoftBody(double x, double y, int numPoints, double radius, double mass,
-            double ks, double kd, double targetPressure) {
-        this.NUM_POINTS = numPoints;
-        this.mass = mass;
-        this.springConstant = ks;
-        this.SPRING_DAMPING = kd;
-        this.targetPressure = targetPressure;
-
-        points = new ArrayList<MassPoint>();
-        springs = new ArrayList<Spring>();
-
-        boundingBox = new Rectangle(x, y, 1, 1); // bounding box is at the centre of the softbody
-
-        createSoftBody(x, y, radius);
+        externalPoints = new ArrayList<>();
+        createSoftBody(x, y, width, height, restLength);
+        this.NUM_POINTS = points.size();
     }
 
     /**
@@ -98,45 +38,79 @@ public class SoftBody implements ReadOnlySoftBody {
      * @param y      y position of the center of the softbody
      * @param radius radius of the softbody
      */
-    void createSoftBody(double x, double y, double radius) {
+    void createSoftBody(double x, double y, int width, int height, int restLength) {
+        int rows = height / restLength;
+        int cols = width / restLength;
 
-        for (int i = 0; i < NUM_POINTS; i++) {
-            Point2D position = new Point2D();
-            position.setX(radius * Math.cos(2 * Math.PI * i / NUM_POINTS) + x);
-            position.setY(radius * Math.sin(2 * Math.PI * i / NUM_POINTS) + y);
-            points.add(new MassPoint(position));
+        double diagonalRestLength = Math.sqrt(2 * (restLength * restLength));
 
+        int[][] pointIndices = new int[rows][cols];
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                points.add(new MassPoint(x + j * restLength, y + i * restLength));
+                pointIndices[i][j] = points.size() - 1;
+
+                // springs to the right
+                if (j < cols - 1) {
+                    springs.add(new Spring((i * cols) + j, (i * cols) + j + 1, restLength));
+                }
+
+                // springs below
+                if (i < rows - 1) {
+                    springs.add(new Spring((i * cols) + j, ((i + 1) * cols) + j, restLength));
+                }
+
+                // springs diagonally below and to the right
+                if (i < rows - 1 && j < cols - 1) {
+                    springs.add(new Spring((i * cols) + j, ((i + 1) * cols) + j + 1, diagonalRestLength));
+                }
+
+                // springs diagonally below and to the left
+                if (i < rows - 1 && j > 0) {
+                    springs.add(new Spring((i * cols) + j, ((i + 1) * cols) + j - 1, diagonalRestLength));
+                }
+            }
         }
 
-        // create springs
-        for (int i = 0; i < NUM_POINTS - 1; i++) {
-            addSpring(i, i + 1);
+        List<Integer> pointIndex = new ArrayList<>();
+
+        // Traverse the top edge
+        for (int i = 0; i < cols; i++) {
+            pointIndex.add(pointIndices[0][i]);
         }
-        addSpring(NUM_POINTS - 1, 0);
-    }
 
-    /**
-     * Adds springs between the points at the specified indexes in the points list
-     * to the springs list.
-     * 
-     * length is calculated using the distance between the two points, which means
-     * that the radius of the softbody
-     * actually does have an impact because it causes the spring to have a certain
-     * equilibrium length, which is used to calculate spring force.
-     *
-     * @param point1 index of the first point
-     * @param point2 index of the second point
-     */
-    void addSpring(int point1, int point2) {
-        // calculate length
-        double length = Math.sqrt(points.get(point1).getPosition().distance(points.get(point2).getPosition()));
+        // Traverse the right edge
+        for (int i = 1; i < rows; i++) {
+            pointIndex.add(pointIndices[i][cols - 1]);
+        }
 
-        this.springs.add(new Spring(point1, point2, length));
+        // Traverse the bottom edge
+        if (rows > 1) { // Check if there is more than one row
+            for (int i = cols - 2; i >= 0; i--) {
+                pointIndex.add(pointIndices[rows - 1][i]);
+            }
+        }
+
+        // Traverse the left edge
+        if (cols > 1) { // Check if there is more than one column
+            for (int i = rows - 2; i > 0; i--) {
+                pointIndex.add(pointIndices[i][0]);
+            }
+        }
+
+        for (Integer integer : pointIndex) {
+            externalPoints.add(points.get(integer));
+        }
+
+        points.get(0).isFixed = true;
+        points.get(cols - 1).isFixed = true;
+
     }
 
     @Override
-    public int getNumPoints() {
-        return this.NUM_POINTS;
+    public ArrayList<MassPoint> points() {
+        return new ArrayList<>(this.externalPoints);
     }
 
     @Override
@@ -144,64 +118,21 @@ public class SoftBody implements ReadOnlySoftBody {
         return new ArrayList<>(this.points);
     }
 
-    @Override
-    public Rectangle getBoundingBox() {
-        return this.boundingBox; // Privacy sacrifice for performance
-    }
-
-    /**
-     * Used for drawing the softbody
-     * 
-     * @return array of x coordinates
-     */
-    @Override
     public int[] getXArr() {
-        int[] xArr = new int[NUM_POINTS];
-        for (int i = 0; i < NUM_POINTS; i++) {
-            double x = points.get(i).getPositionX();
+        int[] xArr = new int[externalPoints.size()];
+        for (int i = 0; i < externalPoints.size(); i++) {
+            double x = externalPoints.get(i).getPositionX();
             xArr[i] = (int) x;
         }
         return xArr;
     }
 
-    /**
-     * Used for drawing the softbody
-     * 
-     * @return array of y coordinates
-     */
-    @Override
     public int[] getYArr() {
-        int[] yArr = new int[NUM_POINTS];
-        for (int i = 0; i < NUM_POINTS; i++) {
-            double y = points.get(i).getPositionY();
+        int[] yArr = new int[externalPoints.size()];
+        for (int i = 0; i < externalPoints.size(); i++) {
+            double y = externalPoints.get(i).getPositionY();
             yArr[i] = (int) y;
         }
         return yArr;
     }
-
-    @Override
-    public double getPressure() {
-        return this.pressure;
-    }
-
-    @Override
-    public double getSpringConstant() {
-        return this.springConstant;
-    }
-
-    @Override
-    public double getSpringDamping() {
-        return this.SPRING_DAMPING;
-    }
-
-    @Override
-    public double getSpringRestLength() {
-        return this.springs.get(0).getLength();
-    }
-
-    @Override
-    public double getMass() {
-        return this.mass;
-    }
-
 }

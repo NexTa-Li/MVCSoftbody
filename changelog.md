@@ -158,25 +158,25 @@
 
 ### Added
 
-`various graphical methods` in `ReadOnlyModel.java`: added methods that return graphical booleans,this way view can use getters instead of accessing the graphical booleans statically.
+- `various graphical methods` in `ReadOnlyModel.java`: added methods that return graphical booleans,this way view can use getters instead of accessing the graphical booleans statically.
 
-`Draw Softbody Info Toggle`: added a toggle that controls whether or not the softbody info is drawn, via the `2` key.
+- `Draw Softbody Info Toggle`: added a toggle that controls whether or not the softbody info is drawn, via the `2` key.
 
 ### Changed
 
-`Method names` in `Rectangle.java`: Changed the names to more accurately represent what they do.
+- `Method names` in `Rectangle.java`: Changed the names to more accurately represent what they do.
 
-`keyPressed()` and `keyReleased()` in `SoftBodyController.java`: Changed the methods to more accurately represent MVC relationships.
+- `keyPressed()` and `keyReleased()` in `SoftBodyController.java`: Changed the methods to more accurately represent MVC relationships.
 
 ### Moved
 
-`Event Methods` in `SoftBody.java` to `SoftBodyController.java`: Moved the event methods to `SoftBodyController.java` since the controller is the one that should be handling the events. This is a step towards a more accurate MVC implementation.
+- `Event Methods` in `SoftBody.java` to `SoftBodyController.java`: Moved the event methods to `SoftBodyController.java` since the controller is the one that should be handling the events. This is a step towards a more accurate MVC implementation.
 
 ### Removed
 
-`input flags` in `SoftBodyController.java`: Removed the input flags since they are already being set when a key is pressed directly to the model by the controller.
+- `input flags` in `SoftBodyController.java`: Removed the input flags since they are already being set when a key is pressed directly to the model by the controller.
 
-`keyPressed()` and `keyReleased()` in `SoftBody.java`: Removed the methods since they are now exclusively handled in `SoftBodyController.java`
+- `keyPressed()` and `keyReleased()` in `SoftBody.java`: Removed the methods since they are now exclusively handled in `SoftBodyController.java`
 
 # **[Version 1.2.0]** - 2023-09-16 - Polygon Collisions
 
@@ -196,27 +196,49 @@
 
 ### Changed
 
-`var names` in `SoftBody.java`: Changed the names of some variables that used to have final signatures.
+- `var names` in `SoftBody.java`: Changed the names of some variables that used to have final signatures.
 
 # **[Version 1.2.1]** - 2023-09-16 - Polygon Refactoring
 
 ### Added
 
-`SoftBodyHandler` class: Added a class that handles the updating of softbodies.
-`BouncePad` class: Added a class that represents a bounce pad which is a subclass of `Polygon2D`.
-`getSoftBodyHandlers()` in `SoftBodyModel.java`: Added a method that returns a list of softbody handlers.
+- `SoftBodyHandler` class: Added a class that handles the updating of softbodies.
+- `BouncePad` class: Added a class that represents a bounce pad which is a subclass of `Polygon2D`.
+- `getSoftBodyHandlers()` in `SoftBodyModel.java`: Added a method that returns a list of softbody handlers.
 
 ### Removed
 
-`SoftBodyCode.md`: removed this file, the current implementation is likely permanent.
+- `SoftBodyCode.md`: removed this file, the current implementation is likely permanent.
 
 ### Changed
 
-`List<Point2D> points` in `Polygon2D.java` to `List<MassPoint> points`: Changed the type of the list to `MassPoint` so that subclasses of the polygon class can be moved around, and have momentum/ carry force like softbodies.
-`Polygon2D` is now an abstract class.
+- `List<Point2D> points` in `Polygon2D.java` to `List<MassPoint> points`: Changed the type of the list to `MassPoint` so that subclasses of the polygon class can be moved around, and have momentum/ carry force like softbodies.
+- `Polygon2D` is now an abstract class.
 
 ### Moved
 
-`Polygon2D` to `polygon` package: Moved the class to the polygon package to support expansion into sub classes of polygon.
+- `Polygon2D` to `polygon` package: Moved the class to the polygon package to support expansion into sub classes of polygon.
 
-`All Handler Methods` in `SoftBody` to `SoftBodyHandler.java`: Moved all the handler/ updater methods to the handler class.
+- `All Handler Methods` in `SoftBody` to `SoftBodyHandler.java`: Moved all the handler/ updater methods to the handler class.
+
+# **[Version 1.2.2]** - 2023-09-22
+
+## This Patch requires heavy refactoring
+
+### Added
+
+- `Point selection`: select points on the selected body by scrolling up or down.
+
+- `Fixed Points`: points can now be fixed. Open the softbody info panel by pressing 2, which will also display the selected point, press 3 and the selected point will be fixed. Press 3 again to toggle.
+
+- `Body` Class: Added a class that represents a body. Abstarcted a lot of the code from `SoftBody.java` into this class. Still needs to be refactored heavily.
+
+- `Regular & Pressurized SoftBody` Classes: added classes that extend Body, which represent SoftBodies and PressurizedSoftBodies respectively.
+
+### Removed
+
+- `Physical Calculation Methods` in `SoftBody.java`: removed the class since it is now replaced by the `SoftBodyHandler` class.
+
+### Changed
+
+- `SoftBodyHandler`: Changed the class in anticipation of a non pressurized softbody implementation.
